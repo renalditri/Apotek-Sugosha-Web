@@ -1,0 +1,16 @@
+@media screen 
+and (max-width : 576px) {
+  .bodyContainer {
+    padding-bottom: 32rem !important;
+  }
+  .footer{
+    position: absolute;
+    bottom: 0;
+    height: 30rem;
+    background-color: red;
+  }
+  .home{
+    background-position: 110% 100%;
+    background-repeat: no-repeat;
+  }
+}
