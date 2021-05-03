@@ -1,17 +1,17 @@
 @import "~bootstrap/scss/bootstrap";
 @import "mediumscreen.css";
 @import "smallscreen.css";
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
 
 #root {
   min-height: 100vh;
 }
 
-p{
+p {
   margin: 0;
 }
 
-span{
+span {
   margin: 0;
 }
 
@@ -39,7 +39,7 @@ h3 {
   line-height: 54px;
 }
 
-h4{
+h4 {
   font-family: Manrope;
   font-style: normal;
   font-weight: 800;
@@ -47,7 +47,7 @@ h4{
   line-height: 40px;
 }
 
-h5{
+h5 {
   font-family: Manrope;
   font-style: normal;
   font-weight: 600;
@@ -55,7 +55,7 @@ h5{
   line-height: 32px;
 }
 
-h6{
+h6 {
   font-family: Manrope;
   font-style: normal;
   font-weight: 500;
@@ -67,7 +67,9 @@ h6{
   border: none !important;
   color: $primary !important;
 
-  &:hover, &:active, &:focus {
+  &:hover,
+  &:active,
+  &:focus {
     color: darken($primary, 15%) !important;
     border: 0 !important;
     outline: 0 !important;
@@ -88,7 +90,9 @@ h6{
     color: darken($primary, 15%) !important;
     border: 1px solid darken($primary, 15%) !important;
   }
-  &:active, &:focus, &.active {
+  &:active,
+  &:focus,
+  &.active {
     color: $primary !important;
     border: 1px solid $primary !important;
   }
@@ -96,11 +100,11 @@ h6{
 
 .card-link {
   &:hover {
-    color: darken(#25B013, 15%) !important;
+    color: darken(#25b013, 15%) !important;
   }
 }
 
-.bg-dark{
+.bg-dark {
   background-color: $gray-900 !important;
 }
 
@@ -129,7 +133,8 @@ h6{
   line-height: 28px;
 }
 
-.body-text, .form-label {
+.body-text,
+.form-label {
   font-family: Manrope;
   font-style: normal;
   font-weight: 400;
@@ -166,25 +171,51 @@ h6{
 }
 
 .text-green {
-  color: #25B013;
+  color: #25b013;
 }
 
-.inline{
+.inline {
   display: inline;
 }
 
-.home{
+.home {
   background-position: 110% 100%;
   background-repeat: no-repeat;
 }
 
-.product-img, .category-img {
-  max-height: 250px;
-  height: auto;
+// .product-img, .category-img {
+//   max-height: 250px;
+//   height: auto;
+//   width: 100%;
+// }
+
+.product-img,
+.category-img {
   width: 100%;
+  height: 10vw;
+  object-fit: cover;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
-a{
+.dropdown-item.active {
+  background-color: white;
+}
+
+.dropdown-item:hover {
+  background-color: $primary;
+  color: white !important;
+}
+
+.dropdown-logout:hover {
+  background: #f46f6f;
+  color: white !important;
+}
+.dropdown-logout {
+  color: #f46f6f;
+}
+
+a {
   color: $gray-900;
 }
 
@@ -193,34 +224,35 @@ a:hover {
 }
 
 .active {
-  color: $green!important;
+  color: $green !important;
 }
 
-.borderless-cell { 
-  border: none!important; 
+.borderless-cell {
+  border: none !important;
 }
 
 .non-button {
-	background: none;
-	color: inherit;
-	border: transparent;
-	cursor: pointer;
-	outline: inherit;
+  background: none;
+  color: inherit;
+  border: transparent;
+  cursor: pointer;
+  outline: inherit;
 }
 
 .checkoutContainer > .container {
   padding-bottom: 8rem;
 }
 
-.bodyContainer{
+.bodyContainer {
   margin-top: 5.5rem;
 }
 
-.bodyContainer > .container, .bodyContainer > .container-fluid{
+.bodyContainer > .container,
+.bodyContainer > .container-fluid {
   padding-bottom: 8rem;
 }
 
-.footer{
+.footer {
   min-height: 15rem;
 }
 
@@ -240,7 +272,7 @@ a:hover {
 
 .bullet {
   position: relative;
-  background: #EFF0F6;
+  background: #eff0f6;
   border-radius: 1000px;
   width: 65px;
   height: 65px;
@@ -251,8 +283,8 @@ a:hover {
 }
 
 .bullet .progress-item {
-  color: #6E7191;
-  font-family: 'Manrope';
+  color: #6e7191;
+  font-family: "Manrope";
   font-style: normal;
   font-weight: bold;
   font-size: 48px;
@@ -262,9 +294,9 @@ a:hover {
 .bullet::after {
   position: absolute;
   top: 50%;
-  content: '';
+  content: "";
   position: absolute;
-  border: 2px dashed #EFF0F6;
+  border: 2px dashed #eff0f6;
   width: 22vw;
   height: 0px;
   z-index: -2;
@@ -274,25 +306,25 @@ a:hover {
   content: none;
 }
 
-.bullet .bar-active::after{
+.bullet .bar-active::after {
   position: absolute;
   top: 50%;
-  content: '';
+  content: "";
   position: absolute;
-  border: 2px solid #25B013;
+  border: 2px solid #25b013;
   width: 22vw;
   height: 0px;
   z-index: -1;
 }
 
-.bullet:last-child .bar-active::after{
+.bullet:last-child .bar-active::after {
   content: none;
 }
 
 .bullet .bar-active {
-  content: 'tes';
-  color: #FCFCFC;
-  background: #25B013;
+  content: "tes";
+  color: #fcfcfc;
+  background: #25b013;
   border-radius: 1000px;
   width: 65px;
   height: 65px;
