@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { BrowserRouter as Router, Switch, Route, useHistory } from "react-router-dom";
-import { Categories, Profile, Resep, Category, ProductDetail, Cart, Home, Product, Checkout, StatusTransaksi } from './pages';
+import { Categories, Profile, Resep, Category, ProductDetail, Cart, Home, Product, Checkout, StatusTransaksi, DetailTransaksi } from './pages';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import NestingExample from './example';
@@ -34,6 +34,7 @@ function App() {
           <Route exact path='/example' component={NestingExample} />
           <Route exact path='/cart' component={Cart} />
           <Route exact path='/status' component={StatusTransaksi} />
+          <Route exact path={`/status/:statusID`} component={DetailTransaksi} />
           <Footer />
         </div>
       </>
@@ -44,6 +45,7 @@ function App() {
     return (
       <>
         <div ref={myRef} className="checkoutContainer">
+          <ScrollToTop />
           <Route path='/checkout' component={Checkout} />
           <Footer />
         </div>
@@ -55,7 +57,7 @@ function App() {
     const history = useHistory();
     useEffect(() => {
       const unlisten = history.listen(() => {
-        scrollTop();
+        window.scrollTo(0, 0);
       });
       return () => {
         unlisten();

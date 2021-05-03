@@ -2,9 +2,9 @@ const statusTransaksi = [
   {
     "nomor_transaksi": "TRX032101",
     "id_user": 1,
-    "status" : 3,
-    "tanggal" : "13/03/2021 16:00 WITA",
-    "jenis" : 0,
+    "status": 3,
+    "tanggal": "13/03/2021 16:00 WITA",
+    "jenis": 0,
     "produk": [
       {
         "id_produk": 1,
@@ -24,7 +24,7 @@ const statusTransaksi = [
       },
       {
         "id_produk": 2,
-        "jumlah" : 1,
+        "jumlah": 1,
         "nama": "Panadol",
         "harga": 5000,
         "qty": 20,
@@ -39,16 +39,21 @@ const statusTransaksi = [
         "img_path": "/img/flu.png",
       },
     ],
-    "total" : 15000,
+    "resep": {},
+    "total": 15000,
   },
   {
     "nomor_transaksi": "TRX032102",
     "id_user": 1,
-    "status" : 0,
-    "tanggal" : "13/03/2021 16:00 WITA",
-    "jenis" : 1,
+    "status": 0,
+    "tanggal": "13/03/2021 16:00 WITA",
+    "jenis": 1,
     "produk": [],
-    "total" : 0,
+    "resep": {
+      "id_resep": "RSP123",
+      "img_path" : "/img/Resep.png"
+      },
+    "total": 0,
   },
 ]
 

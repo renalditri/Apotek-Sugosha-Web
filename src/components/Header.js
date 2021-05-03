@@ -7,7 +7,7 @@ import logo from '../assets/img/logo.png';
 export default class Header extends Component {
   render() {
     return (
-      <Navbar className="py-3 medium-label" bg="light" expand="lg">
+      <Navbar fixed="top" className="py-3 medium-label" bg="light" expand="lg">
         <Container>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Row className="w-100">

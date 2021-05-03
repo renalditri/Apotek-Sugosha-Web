@@ -3,11 +3,6 @@
 @import "smallscreen.css";
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
 
-html, body {
-  overflow: hidden;
-}
-
-
 #root {
   min-height: 100vh;
 }
@@ -213,26 +208,16 @@ a:hover {
 	outline: inherit;
 }
 
-.checkoutContainer {
-  height: 100vh;
-  overflow: auto;
-}
-
 .checkoutContainer > .container {
   padding-bottom: 8rem;
 }
 
-.bodyContainer {
-  height: 90vh;
-  overflow: auto;
+.bodyContainer{
+  margin-top: 5.5rem;
 }
 
 .bodyContainer > .container, .bodyContainer > .container-fluid{
   padding-bottom: 8rem;
-}
-
-.bodyContainer:first-child {
-  min-height: 50vh;
 }
 
 .footer{

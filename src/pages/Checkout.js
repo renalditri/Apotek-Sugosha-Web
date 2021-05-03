@@ -38,8 +38,8 @@ export default function Checkout() {
       >
         <path
           d="M7.96289 1L0.999718 7.96317L7.96289 14.9263"
-          stroke="#14142B" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round"
+          stroke="#14142B" strokeWidth="2"
+          strokeLinecap="round" strokeLinejoin="round"
         />
       </svg>
     );
