@@ -198,11 +198,7 @@ h6 {
   border-top-right-radius: 8px;
 }
 
-.dropdown-item.active {
-  background-color: white;
-}
-
-.dropdown-item:hover {
+.dropdown-item:hover, .dropdown-item.active {
   background-color: $primary;
   color: white !important;
 }
