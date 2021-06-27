@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { _CardDeck, Text, Breadcrumb } from '../components/parts';
 import { Row, Col, Container, Form } from 'react-bootstrap';
 import { BrowserRouter as Router, useRouteMatch } from "react-router-dom";
@@ -9,6 +9,27 @@ export default function Categories() {
   const [categoryList, setCategoryList] = useState(categories);
   const path = [{ name: 'Home', to: '/' }]
   const current = 'Kategori'
+
+  useEffect(() => {
+    fetch('http://localhost:4000/kategori')
+    .then(res => res.json())
+    .then(res => {
+      let arr = []
+      res.map(r => {
+        if(r.tampil) {
+          arr.push({
+            id: r.id_kategori,
+            nama: r.nama,
+            img_path: 'http://localhost:4000/' + r.img_path
+          })
+        }
+      })
+      setCategoryList(arr)
+    })
+    .catch(err => {
+      console.error('Error: ', err)
+    })
+  }, []);
 
   function search(e, categories) {
     console.log(e.target.value);

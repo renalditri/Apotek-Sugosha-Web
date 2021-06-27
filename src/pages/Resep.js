@@ -2,7 +2,43 @@ import React, { useState } from 'react'
 import { Container, Row, Col, Form, Card, Button } from 'react-bootstrap';
 import { Text } from '../components/parts'
 
-function Resep() {
+const user_id = 1;
+
+function Resep(props) {
+  const [img, setImg] = useState()
+
+  const postResep = () => {
+    if(!img) {
+      console.log(img);
+      alert('Isi gambar terlebih dahulu')
+    } else {
+      const formData = new FormData();
+      formData.append("id_pembeli", user_id);
+      formData.append("data_pengiriman", "{}");
+      formData.append("status", 0);
+      formData.append("jenis", 1);
+      formData.append("resep", img);
+      fetch('http://localhost:4000/transaksi/resep', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => {
+        if(res.status == 200) {
+          console.log(res);
+          alert('Resep berhasil dikirim!');
+          props.history.push('/');
+        } else {
+          console.log(res);
+          alert('Resep gagal terkirim');
+        }
+      })
+      .catch(err => {
+        console.log('Err: ', err);
+        alert('Resep gagal terkirim');
+      })
+    }
+  }
+
   return (
     <Container>
       <Row className="mt-3">
@@ -13,13 +49,13 @@ function Resep() {
       </Row>
       <Row>
         <Col md={8}>
-          {ImageInput()}
+          <ImageInput setImg={setImg} />
         </Col>
         <Col md={4}>
           <Card className="px-3 pt-1 pb-3">
             <Text className="mb-2" type="large-label">Perhatian</Text>
             <Text className="mb-2" type="body">Harap cek foto resep agar tulisan pada resep terlihat jelas dan dapat dibaca</Text>
-            <Button>Kirim resep</Button>
+            <Button onClick={() => {postResep()}}>Kirim resep</Button>
           </Card>
         </Col>
       </Row>
@@ -27,12 +63,13 @@ function Resep() {
   )
 }
 
-function ImageInput() {
-  const [img, setImg] = useState()
+function ImageInput(props) {
+  const { setImg } = props
+  const [preview, setPreview] = useState()
   return (
     <Card className="p-2">
       <div className="p-1 text-center" style={{border: '4px dashed #25B013', minHeight: '100px'}}>
-        <img className="img-fluid w-100 text-center" src={img} alt="Foto Resep" />
+        <img className="img-fluid w-100 text-center" src={preview} alt="Foto Resep" />
       </div>
       <input
         type="file"
@@ -51,12 +88,19 @@ function ImageInput() {
   )
 
   function imageHandler(e) {
+    const maxSize = 4194304
     const file = e.target.files[0];
-    let reader = new FileReader();
-    reader.onloadend = () => {
-      setImg(reader.result);
-    };
-    reader.readAsDataURL(file);
+    console.log(file);
+    if(file.size < maxSize) {
+      let reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result)
+        setImg(file);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      alert('Besar file gambar tidak boleh melebihi 4 MB')
+    }
   }
 }
 

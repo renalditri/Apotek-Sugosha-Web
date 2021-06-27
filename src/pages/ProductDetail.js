@@ -1,33 +1,92 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Table, Row, Col, Card, Button, ButtonGroup, Form } from 'react-bootstrap';
 import { BrowserRouter as Router, useParams, useRouteMatch } from "react-router-dom";
 import { Text, Breadcrumb } from '../components/parts';
-import products from '../assets/data/Products.Data';
-import categories from '../assets/data/Categories.Data';
 import Currency from '../Currency';
+
+let pathDefault = [
+  { name: 'Home', to: '/' },
+  { name: 'Katalog Produk', to: '/produk' },
+]
+
+const user_id = 1;
 
 export default function ProductDetail(props) {
   const { productID, kategoriID } = useParams();
   const { url } = useRouteMatch();
-  const product = findProduct(productID);
-  let path = [
-    { name: 'Home', to: '/' },
-    { name: 'Katalog Produk', to: '/produk' },
-  ]
+  const [product, setProduct] = useState({
+    "nama": "Formula 44",
+    "harga": 15000,
+    "qty": 15,
+    "satuan": "Botol",
+    "deskripsi": {
+      "Exp Date": "08/03/2024",
+      "Komposisi": "Paracetamol 120 mg"
+    },
+    "img_path": "/img/flu.png"
+  });
+  const [path, setPath] = useState(pathDefault);
   if (kategoriID) {
-    const currentCategory = findCategory(kategoriID)
-    path = [
-      { name: 'Home', to: '/' },
-      { name: 'Kategori', to: '/kategori' },
-      { name: currentCategory.nama, to: `/kategori/${kategoriID}` }
-    ]
+    fetch('http://localhost:4000/kategori/' + kategoriID)
+      .then(res => res.json())
+      .then(res => {
+        pathDefault = [
+          { name: 'Home', to: '/' },
+          { name: 'Kategori', to: '/kategori' },
+          { name: res.nama, to: `/kategori/${kategoriID}` }
+        ]
+        console.log('tes', pathDefault)
+      })
   } const current = product.nama;
+
+  useEffect(() => {
+    fetch('http://localhost:4000/produk/' + productID)
+      .then(res => res.json())
+      .then(res => {
+        console.log('ha', product)
+        res.img_path = 'http://localhost:4000/' + res.img_path;
+        setProduct({ id: res.id_produk, ...res })
+        console.log('hi', product)
+      })
+  }, [])
+
+  useEffect(() => {
+    setPath(pathDefault);
+    console.log('tes2', pathDefault)
+    console.log('hmm', path)
+    return () => {
+      console.log('LAH')
+    }
+  }, [pathDefault])
+
+  function addCart(total) {
+    let cart = {
+      id_pembeli: user_id,
+      id_produk: productID,
+      jumlah: total
+    }
+    fetch('http://localhost:4000/keranjang/', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify(cart)
+    })
+    .then(res => {
+      console.log(res);
+      alert('Berhasil menambahkan barang ke keranjang!');
+    })
+    .catch(err => {
+      console.log('Err: ', err);
+      alert('Gagal menambahkan barang ke keranjang')
+    })
+  }
 
   return (
     <Container className="py-3">
       <Breadcrumb url={path} current={current} />
       <Row className="my-3">
-        <ProductHead {...product} />
+        <ProductHead funct={addCart} {...product} />
       </Row>
       <Row className="my-3">
         <Col>
@@ -121,22 +180,10 @@ function ProductHead(props) {
         </Row>
         <Row className="my-2">
           <Col>
-            <Button className="py-2 px-5 large-label">Beli Sekarang</Button>
+            <Button onClick={() => { props.funct(count) }} className="py-2 px-5 large-label">Beli Sekarang</Button>
           </Col>
         </Row>
       </Col>
     </>
   )
-}
-
-function findProduct(id) {
-  return products.find(product => {
-    return product.id == id;
-  })
-}
-
-function findCategory(id) {
-  return categories.find(category => {
-    return category.id == id;
-  })
 }

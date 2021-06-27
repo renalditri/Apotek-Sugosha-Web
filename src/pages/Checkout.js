@@ -170,7 +170,7 @@ export default function Checkout() {
           </Row>
         </Col>
         <Col md={4}>
-          <CheckoutCard onClick={onClick} array={carts} />
+          <CheckoutCard onClick={onClick} array={carts.produk} />
         </Col>
       </Row>
     )
@@ -180,7 +180,7 @@ export default function Checkout() {
     const { currentStep, onClick } = props;
     const items = () => {
       let x = { jumlah: 0, harga: 0, };
-      carts.forEach((cart) => {
+      carts.produk.forEach((cart) => {
         x.jumlah += cart.jumlah;
         x.harga += cart.harga * cart.jumlah;
       })
@@ -217,7 +217,7 @@ export default function Checkout() {
                 <DetailBarang />
                 <tr className="table-borderless">
                   <td colSpan="2">
-                    <Text type="body" green>Total ({carts.length} Obat)</Text>
+                    <Text type="body" green>Total ({carts.produk.length} Obat)</Text>
                   </td>
                   <td className="p-2">
                     <Text type="body" green>{Currency.format(items().harga)}</Text>
@@ -246,7 +246,7 @@ export default function Checkout() {
   }
 
   function DetailBarang() {
-    return carts.map((cart, i) => {
+    return carts.produk.map((cart, i) => {
       return (
         <tr className="table-borderless">
           <td colSpan="2">
