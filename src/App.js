@@ -1,9 +1,28 @@
 import React, { useEffect, useRef } from "react";
-import { BrowserRouter as Router, Switch, Route, useHistory } from "react-router-dom";
-import { Categories, Profile, Resep, Category, ProductDetail, Cart, Home, Product, Checkout, StatusTransaksi, DetailTransaksi } from './pages';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import NestingExample from './example';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  useHistory,
+} from "react-router-dom";
+import {
+  Categories,
+  Profile,
+  Resep,
+  Category,
+  ProductDetail,
+  Cart,
+  Home,
+  Product,
+  Checkout,
+  StatusTransaksi,
+  DetailTransaksi,
+  Login,
+  Daftar,
+} from "./pages";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import NestingExample from "./example";
 
 function App() {
   const myRef = useRef(1);
@@ -23,22 +42,28 @@ function App() {
         <Header />
         <div ref={myRef} className="bodyContainer">
           <ScrollToTop />
-          <Route exact path='/' component={Home} />
-          <Route exact path={`/kategori/:kategoriID/:productID`} component={ProductDetail} />
+          <Route exact path="/" component={Home} />
+          <Route exact path="/login" component={Login} />
+          <Route exact path="/Daftar" component={Daftar} />
+          <Route
+            exact
+            path={`/kategori/:kategoriID/:productID`}
+            component={ProductDetail}
+          />
           <Route exact path={`/produk/:productID`} component={ProductDetail} />
           <Route exact path={`/kategori/:kategoriID`} component={Category} />
-          <Route exact path='/kategori' component={Categories} />
-          <Route exact path='/produk' component={Product} />
-          <Route exact path='/profil' component={Profile} />
-          <Route exact path='/resep' component={Resep} />
-          <Route exact path='/example' component={NestingExample} />
-          <Route exact path='/cart' component={Cart} />
-          <Route exact path='/status' component={StatusTransaksi} />
+          <Route exact path="/kategori" component={Categories} />
+          <Route exact path="/produk" component={Product} />
+          <Route exact path="/profil" component={Profile} />
+          <Route exact path="/resep" component={Resep} />
+          <Route exact path="/example" component={NestingExample} />
+          <Route exact path="/cart" component={Cart} />
+          <Route exact path="/status" component={StatusTransaksi} />
           <Route exact path={`/status/:statusID`} component={DetailTransaksi} />
           <Footer />
         </div>
       </>
-    )
+    );
   }
 
   function withoutNavbar() {
@@ -46,11 +71,11 @@ function App() {
       <>
         <div ref={myRef} className="checkoutContainer">
           <ScrollToTop />
-          <Route path='/checkout' component={Checkout} />
+          <Route path="/checkout" component={Checkout} />
           <Footer />
         </div>
       </>
-    )
+    );
   }
 
   function ScrollToTop() {
@@ -61,8 +86,8 @@ function App() {
       });
       return () => {
         unlisten();
-      }
-    }, [])
+      };
+    }, []);
     return null;
   }
 }
