@@ -7,6 +7,11 @@ import { LinkContainer } from 'react-router-bootstrap';
 export default function StatusCard(props) {
   const { data, thisKey } = props;
   const key = thisKey;
+  if(data.produk.length < 1 && data.jenis == 0) {
+    console.log('BATAL', data);
+    return "";
+  }
+  console.log('JADI', data);
   const produkUtama = data.produk[0];
   const isResep = (data.jenis === 1) ? true : false;
   const getStatus = (key) => {
@@ -23,8 +28,8 @@ export default function StatusCard(props) {
   }
 
   const usedData = {
-    "img_path": ((isResep) ? data.resep.img_path : produkUtama.img_path),
-    "produk_text": ((isResep) ? `Tebus Resep (${data.resep.id_resep})` : `${produkUtama.nama} (${produkUtama.jumlah} ${produkUtama.satuan})`),
+    "img_path": ((isResep) ? data.foto_resep : produkUtama.img_path),
+    "produk_text": ((isResep) ? `Tebus Resep (${data.id_resep})` : `${produkUtama.nama_produk} (${produkUtama.jumlah} ${produkUtama.satuan})`),
     "total_harga": ((isResep && data.status === 0) ? "Menunggu Verifikasi" : Currency.format(data.total))
   }
 
@@ -52,8 +57,8 @@ export default function StatusCard(props) {
       <CardHeader />
       <Row key={'row-2-' + key}>
         <Col key={'col-2-' + key} className="d-flex">
-          <div key={'div-4-' + key} className="d-flex align-items-start justify-content-start" style={{ maxWidth: '9rem' }}>
-            <img key={'img-1-' + key} src={usedData.img_path} className="img-fluid h-100" />
+          <div key={'div-4-' + key} className="d-flex align-items-start justify-content-start" style={{ width: '9rem' }}>
+            <img key={'img-1-' + key} src={usedData.img_path} className="img-fluid h-100 w-100" />
           </div>
           <div key={'div-5-' + key} className="d-flex flex-column align-items-start justify-content-start p-3" style={{ flexGrow: 3 }}>
             <Text key={'text-7-' + key} type="large-label">{usedData.produk_text}</Text>

@@ -11,3 +11,4 @@ export { default as Product } from "./Product";
 export { default as Checkout } from "./Checkout";
 export { default as StatusTransaksi } from "./StatusTransaksi";
 export { default as DetailTransaksi } from "./DetailTransaksi";
+export { default as Logout } from "./Logout";

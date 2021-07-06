@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Form } from 'react-bootstrap';
 import { Text } from '../components/parts';
-import statusTransaksi from '../assets/data/Status.Data';
+import plStatusTransaksi from '../assets/data/Status.Data';
 import Currency from '../Currency';
 import StatusCardDeck from '../components/parts/Status/StatusCardDeck';
+import { authenticationService } from '../services/authentication';
+
+const user_id = authenticationService.user_id;
 
 export default function StatusTransaksi() {
   const statusCode = {
@@ -22,6 +25,26 @@ export default function StatusTransaksi() {
   }
   const [filterStatus, setFilterStatus] = useState(statusCode.SEMUA);
   const [filterJenis, setFilterJenis] = useState(jenisCode.SEMUA);
+  const [statusTransaksi, setStatusTransaksi] = useState(plStatusTransaksi);
+
+  useEffect(() => {
+    fetch(`http://localhost:4000/transaksi/pembeli/${user_id}`)
+      .then(res => res.json())
+      .then(resolve => {
+        console.log('tes', resolve)
+        resolve.map(res => {
+          if (res.foto_resep) { res.foto_resep = 'http://localhost:4000/' + res.foto_resep }
+          if (res.bukti_pembayaran) { res.bukti_pembayaran = 'http://localhost:4000/' + res.bukti_pembayaran }
+          if (res.produk) {
+            res.produk.map(r => {
+              if (r.img_path) { r.img_path = 'http://localhost:4000/' + r.img_path }
+            })
+          }
+        })
+        setStatusTransaksi(resolve);
+      })
+  }, [])
+
   return (
     <Container>
       <Row className="mt-3">

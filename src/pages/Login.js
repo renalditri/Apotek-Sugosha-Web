@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import { Container, Button, Form } from "react-bootstrap";
+import { authenticationService } from "../services/authentication"
 
-function Login() {
+function Login(props) {
   const [NoHP, setNoHP] = useState("");
   const [password, setpassword] = useState("");
   const [isChecked, setCheck] = useState(false);
   const Swal = require("sweetalert2");
+
+  if(authenticationService.currentUser) { props.history.push('/') }
+
   const isValid = () => {
     let valid = true;
     if (NoHP === "") {
@@ -22,23 +26,38 @@ function Login() {
     console.log(password);
     console.log(isChecked);
     if (isValid()) {
-      Swal.fire({
-        icon: "success",
-        title: "Berhasil",
-        text: "Login berhasil",
-        showConfirmButton: false,
-        timer: 800,
-      });
-      setTimeout(function () {
-        window.location.href = "/";
-      }, 900);
+      authenticationService.login(NoHP, password)
+      .then( user => {
+        console.log(user);
+        Swal.fire({
+          icon: "success",
+          title: "Berhasil",
+          text: "Login berhasil",
+          showConfirmButton: false,
+          timer: 1800,
+        });
+      })
+      .then(res => {
+        props.history.push('/');
+      })
+      .catch(err => {
+        console.log(err);
+        const wrongData = (err == 'Data yang dikirim tidak valid, mohon dicek kembali');
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: (wrongData) ? "Nomor Hp/Password yang dimasukkan salah" : "Terdapat masalah dalam proses login",
+          showConfirmButton: false,
+          timer: 1800,
+        });
+      })
     } else {
       Swal.fire({
         icon: "error",
         title: "Gagal",
         text: "Silahkan cek kembali data yang diinputkan",
         showConfirmButton: false,
-        timer: 800,
+        timer: 1800,
       });
     }
   };

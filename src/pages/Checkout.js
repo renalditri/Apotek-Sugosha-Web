@@ -1,14 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { _CardDeck, Text, CheckoutCard } from '../components/parts';
 import { Row, Col, Container, Form, Card, Button, Table } from 'react-bootstrap';
-import { BrowserRouter as Router, Link } from "react-router-dom";
-import carts from '../assets/data/Carts.Data';
-import userSavedData from '../assets/data/User.Data';
+import { BrowserRouter as Router, Link, useParams } from "react-router-dom";
+import plCarts from '../assets/data/Carts.Data';
+import plUserData from '../assets/data/User.Data';
 import Currency from '../Currency';
+import { authenticationService } from '../services/authentication';
 
-export default function Checkout() {
+const user_id = authenticationService.user_id;
+const base_url = 'http://localhost:4000'
+
+export default function Checkout(props) {
   const [stepCounter, setStep] = useState(1);
-  const [userData, setUserData] = useState(userSavedData);
+  const [userData, setUserData] = useState(plUserData);
+  const { nomorTR } = useParams();
+  const [dataTransaksi, setData] = useState(plCarts);
+  const [dataPengiriman, setDataPengiriman] = useState();
+
+  useEffect(() => {
+    fetch('http://localhost:4000/pembeli/' + user_id)
+      .then(res => res.json())
+      .then(res => {
+        console.log(res);
+        setUserData(res);
+        const url = (nomorTR) ? `${base_url}/transaksi/${nomorTR}` : `${base_url}/keranjang/${user_id}`;
+        return fetch(url)
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.status) {
+          if (res.status !== 1 || res.jenis !== 1) {
+            alert('Anda tidak dapat mengakses transaksi ini!');
+            props.history.push('/');
+            return;
+          }
+        }
+        if (user_id !== res.id_pembeli) {
+          alert('Anda tidak dapat mengakses transaksi ini!');
+          props.history.push('/');
+          return;
+        }
+        console.log(res);
+        setData(res);
+      })
+  }, [])
 
   return (
     <Container>
@@ -16,7 +51,9 @@ export default function Checkout() {
         <Col>
           <BackButton />
           <h1>Proses Checkout</h1>
-          <Text type="subtitle-1">Nomor Transaksi: TEX0103</Text>
+          {(!nomorTR) ? '' :
+            <Text type="subtitle-1">Nomor Transaksi: {nomorTR}</Text>
+          }
         </Col>
       </Row>
       <Row>
@@ -25,7 +62,7 @@ export default function Checkout() {
         </Col>
       </Row>
       <FirstPage currentStep={stepCounter} onClick={() => next()} data={userData} />
-      <SecondPage currentStep={stepCounter} onClick={() => next()} />
+      <SecondPage currentStep={stepCounter} onClick={() => next()} data={dataTransaksi} />
       <ThirdPage currentStep={stepCounter} onClick={() => next()} />
     </Container>
   )
@@ -58,17 +95,31 @@ export default function Checkout() {
       )
     }
 
-    return (
-      <Link className="no-hover" to='/cart'>
-        {svg}
-        <Text
-          style={{ textAlign: 'center', verticalAlign: 'middle' }}
-          inline type="large-label"
-        >
-          Keranjang
-        </Text>
-      </Link>
-    )
+    if (nomorTR) {
+      return (
+        <Link className="no-hover" to='/status'>
+          {svg}
+          <Text
+            style={{ textAlign: 'center', verticalAlign: 'middle' }}
+            inline type="large-label"
+          >
+            Keluar
+          </Text>
+        </Link>
+      )
+    } else {
+      return (
+        <Link className="no-hover" to='/cart'>
+          {svg}
+          <Text
+            style={{ textAlign: 'center', verticalAlign: 'middle' }}
+            inline type="large-label"
+          >
+            Keranjang
+          </Text>
+        </Link>
+      )
+    }
   }
 
   function next() {
@@ -109,8 +160,80 @@ export default function Checkout() {
   }
 
   function FirstPage(props) {
+    const gojek = "Gojek - bayar di tujuan ongkir min.  Rp10.000";
+    const grab = "Grab - bayar di tujuan ongkir min.  Rp10.000"
     const { currentStep, onClick, data } = props;
-    if (currentStep !== 1) return null;
+    const [nama, setNama] = useState();
+    const [nomor_telepon, setNomor] = useState();
+    const [kota, setKota] = useState('');
+    const [alamat, setAlamat] = useState();
+    const [simpan, setSimpan] = useState(false);
+    const [kurir, setKurir] = useState(gojek);
+
+    useEffect(() => {
+      if (data.nomor_telepon == '08xxxxxxxxx') { return; }
+      console.log('DATA: ', data)
+      setNama(data.nama);
+      setNomor(data.nomor_telepon);
+      if (data.saved_data) {
+        setKota(data.saved_data.kota);
+        setAlamat(data.saved_data.alamat);
+      }
+    }, [data, currentStep])
+
+    if (currentStep !== 1) { return null; };
+
+
+    const checkData = () => {
+      const validate = [nama, nomor_telepon, kota, alamat];
+      const pesan = []
+      const keys = ['Nama', 'Nomor Telepon', 'Kota', 'Alamat']
+      validate.forEach((d, i) => {
+        if (d === '' || d === null || !d) {
+          pesan.push(keys[i])
+        }
+      })
+      if (pesan.length > 0) {
+        alert(`Mohon isi ${pesan.join(' dan ')} anda`);
+        return;
+      }
+
+      if (simpan) {
+        const bodySavedData = {
+          kota: kota,
+          alamat: alamat
+        }
+        fetch(`http://localhost:4000/pembeli/${user_id}`, {
+          method: 'PUT',
+          headers: {
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({ saved_data: JSON.stringify(bodySavedData) })
+        })
+          .then(res => console.log(res))
+          .then(res => {
+            setDataPengiriman({
+              nama: nama,
+              nomor_telepon: nomor_telepon,
+              kota: kota,
+              alamat: alamat,
+              kurir: kurir
+            })
+            alert(dataTransaksi)
+            next();
+          })
+      } else {
+        setDataPengiriman({
+          nama: nama,
+          nomor_telepon: nomor_telepon,
+          kota: kota,
+          alamat: alamat,
+          kurir: kurir
+        })
+        alert(dataTransaksi)
+        next();
+      }
+    }
 
     return (
       <Row className="mt-5">
@@ -127,41 +250,57 @@ export default function Checkout() {
                 <Row>
                   <Col>
                     <Form.Label>Nama Penerima</Form.Label>
-                    <Form.Control type="text" value={data.nama}></Form.Control>
+                    <Form.Control onChange={(e) => { setNama(e.target.value) }} type="text" value={nama ?? data.nama}></Form.Control>
                   </Col>
                   <Col>
                     <Form.Label>No Telepon Penerima</Form.Label>
-                    <Form.Control type="tel" value={data.nomor}></Form.Control>
+                    <Form.Control disabled type="tel" value={data.nomor_telepon}></Form.Control>
                   </Col>
                 </Row>
                 <Row className="mt-3">
                   <Col md={6}>
                     <Form.Label>Kota</Form.Label>
-                    <Form.Control className="body-text" as="select" custom>
-                      <option value="" selected disabled hidden>Pilih kota anda</option>
-                      <option>Denpasar</option>
-                      <option>Ubud</option>
-                      <option>Kuta</option>
+                    <Form.Control onChange={(e) => { setKota(e.target.value) }}
+                      className="body-text"
+                      as="select"
+                      custom
+                      defaultValue={''}
+                      value={kota}
+                    >
+                      <option value="" disabled hidden>Pilih kota/kabupaten anda</option>
+                      <option value="Kabupaten Badung">Kabupaten Badung</option>
+                      <option value="Kabupaten Gianyar">Kabupaten Gianyar</option>
+                      <option value="Kota Denpasar">Kota Denpasar</option>
                     </Form.Control>
                   </Col>
                 </Row>
                 <Row className="mt-3">
                   <Col>
                     <Form.Label>Alamat Lengkap</Form.Label>
-                    <Form.Control as="textarea" value={data.alamat}></Form.Control>
+                    <Form.Control
+                      onChange={(e) => { setAlamat(e.target.value) }}
+                      as="textarea"
+                    >{alamat ?? (data.saved_data) ? data.saved_data.alamat : ''}</Form.Control>
                     <Form.Check
                       className="mt-2"
                       type="checkbox"
-                      label="Simpan informasi ini untuk transaksi berikutnya">
+                      label="Simpan informasi ini untuk transaksi berikutnya"
+                      onChange={(e) => { setSimpan(e.target.checked) }}
+                    >
                     </Form.Check>
                   </Col>
                 </Row>
                 <Row className="mt-3">
                   <Col>
                     <Form.Label>Kurir</Form.Label>
-                    <Form.Control className="body-text" as="select" custom>
-                      <option>Gojek - bayar di tujuan ongkir min.  Rp10.000</option>
-                      <option>Grab - bayar di tujuan ongkir min.  Rp10.000</option>
+                    <Form.Control
+                      onChange={(e) => { setKurir(e.target.value) }}
+                      className="body-text"
+                      as="select"
+                      custom
+                    >
+                      <option value={gojek}>{gojek}</option>
+                      <option value={grab}>{grab}</option>
                     </Form.Control>
                   </Col>
                 </Row>
@@ -170,7 +309,7 @@ export default function Checkout() {
           </Row>
         </Col>
         <Col md={4}>
-          <CheckoutCard onClick={onClick} array={carts.produk} />
+          <CheckoutCard onClick={checkData} array={dataTransaksi.produk} />
         </Col>
       </Row>
     )
@@ -178,15 +317,28 @@ export default function Checkout() {
 
   function SecondPage(props) {
     const { currentStep, onClick } = props;
+
+    console.log(dataTransaksi);
+
     const items = () => {
-      let x = { jumlah: 0, harga: 0, };
-      carts.produk.forEach((cart) => {
+      let x = { jumlah: 0, total: 0, };
+      dataTransaksi.produk.forEach((cart) => {
         x.jumlah += cart.jumlah;
-        x.harga += cart.harga * cart.jumlah;
+        x.total += cart.harga * cart.jumlah;
       })
+      if (dataTransaksi.total) {
+        return {
+          jumlah: x.jumlah,
+          total: dataTransaksi.total
+        };
+      }
       return x;
     }
-    if (currentStep !== 2) return null;
+
+    console.log('item', items())
+    console.log(dataPengiriman)
+
+    if (currentStep !== 2) { return null; };
 
     return (
       <>
@@ -207,7 +359,7 @@ export default function Checkout() {
                   <Text type="subtitle-1">Bank : BCA</Text>
                   <Text type="subtitle-1">No. Rekening :12738725362363</Text>
                   <Text type="subtitle-1">Penerima : Apotek Sugosha</Text>
-                  <h4 className="text-green mt-2">Sebesar : {Currency.format(items().harga)}</h4>
+                  <h4 className="text-green mt-2">Sebesar : {Currency.format(items().total)}</h4>
                 </Col>
               </Row>
             </Card>
@@ -217,15 +369,15 @@ export default function Checkout() {
                 <DetailBarang />
                 <tr className="table-borderless">
                   <td colSpan="2">
-                    <Text type="body" green>Total ({carts.produk.length} Obat)</Text>
+                    <Text type="body" green>Total ({dataTransaksi.produk.length} Obat)</Text>
                   </td>
                   <td className="p-2">
-                    <Text type="body" green>{Currency.format(items().harga)}</Text>
+                    <Text type="body" green>{Currency.format(items().total)}</Text>
                   </td>
                 </tr>
                 <tr>
                   <td colSpan="2">
-                    Pengiriman ke {userData.alamat}, {userData.kota}, a/n {userData.nama} ({userData.nomor})
+                    Pengiriman ke {dataPengiriman.alamat}, {dataPengiriman.kota}, a/n {dataPengiriman.nama} ({dataPengiriman.nomor_telepon})
                   </td>
                   <td className="p-2">
                     Gojek - bayar di tujuan ongkir min.  Rp10.000
@@ -246,11 +398,11 @@ export default function Checkout() {
   }
 
   function DetailBarang() {
-    return carts.produk.map((cart, i) => {
+    return dataTransaksi.produk.map((cart, i) => {
       return (
         <tr className="table-borderless">
           <td colSpan="2">
-            {cart.nama} ({cart.jumlah} {cart.satuan})
+            {cart.nama_produk} ({cart.jumlah} {cart.satuan})
           </td>
           <td className="p-2" style={{ width: '30%' }}>
             {Currency.format(cart.harga)}/{cart.satuan}
@@ -262,7 +414,68 @@ export default function Checkout() {
 
   function ThirdPage(props) {
     const { currentStep, onClick } = props;
+    const [img, setImg] = useState();
+    const [preview, setPreview] = useState();
     if (currentStep !== 3) return null;
+
+    const sendTransaksi = () => {
+      if (!img) {
+        alert('Masukkan gambar bukti transaksi terlebih dahulu');
+        return;
+      }
+      const formData = new FormData();
+      if (nomorTR) {
+        formData.append("nomor_transaksi", nomorTR);
+        formData.append("bukti", img);
+        fetch(base_url + '/upload/bukti', {
+          method: 'POST',
+          body: formData,
+        })
+          .then(res => res.json())
+          .then(res => console.log(res))
+          .catch(err => console.log(err))
+      } else {
+        const dataSend = {
+          id_pembeli: user_id,
+          data_pengiriman: {
+            kota: dataPengiriman.kota,
+            alamat: dataPengiriman.alamat,
+            kurir: dataPengiriman.kurir
+          },
+          status: 2,
+          jenis: 0,
+          produk: dataTransaksi.produk.map(p => { return {id_produk: p.id_produk, jumlah: p.jumlah} })
+        }
+        console.log(JSON.stringify(dataSend));
+        fetch(base_url + '/transaksi', {
+          method: 'POST',
+          headers: {
+            "Content-Type" : "application/json"
+          },
+          body: JSON.stringify(dataSend),
+        })
+        .then(res => res.json())
+        .then(res => {
+          if(res.id) {
+            formData.append("nomor_transaksi", res.id);
+            formData.append("bukti", img);
+            return fetch(base_url + '/upload/bukti', {
+              method: 'POST',
+              body: formData,
+            })
+          }
+          console.log(res);
+        })
+        .then(res => res.json())
+        .then(res => {
+          console.log(res);
+          alert('Transaksi telah dilakukan');
+          return fetch(base_url + '/keranjang/' + user_id, { method: 'DELETE' })
+        })
+        .then(res => { onClick() })
+        .catch(err => console.log(err))
+      }
+    }
 
     return (
       <>
@@ -273,12 +486,12 @@ export default function Checkout() {
         </Row>
         <Row className="mt-3">
           <Col md={8}>
-            <ImageInput />
+            <ImageInput setImg={setImg} preview={preview} setPreview={setPreview} />
           </Col>
           <Col md={4}>
             <Card className="p-4">
               <Text type="large-label">Lanjutkan Checkout</Text>
-              <Button onClick={onClick} className="mt-3 w-100">Kirim bukti transfer</Button>
+              <Button onClick={() => sendTransaksi()} className="mt-3 w-100">Kirim bukti transfer</Button>
             </Card>
           </Col>
         </Row>
@@ -286,12 +499,12 @@ export default function Checkout() {
     )
 
 
-    function ImageInput() {
-      const [img, setImg] = useState()
+    function ImageInput(props) {
+      const { setImg, preview, setPreview } = props;
       return (
         <Card className="p-2">
           <div className="p-1 text-center" style={{ border: '4px dashed #25B013', minHeight: '100px' }}>
-            <img className="img-fluid w-100 text-center" src={img} alt="Foto Resep" />
+            <img className="img-fluid w-100 text-center" src={preview} alt="Foto Bukti Pembayaran" />
           </div>
           <input
             type="file"
@@ -310,12 +523,19 @@ export default function Checkout() {
       )
 
       function imageHandler(e) {
+        const maxSize = 4194304
         const file = e.target.files[0];
-        let reader = new FileReader();
-        reader.onloadend = () => {
-          setImg(reader.result);
-        };
-        reader.readAsDataURL(file);
+        console.log(file);
+        if (file.size < maxSize) {
+          let reader = new FileReader();
+          reader.onloadend = () => {
+            setPreview(reader.result)
+            setImg(file);
+          };
+          reader.readAsDataURL(file);
+        } else {
+          alert('Besar file gambar tidak boleh melebihi 4 MB')
+        }
       }
     }
   }

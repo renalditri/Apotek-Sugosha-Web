@@ -13,8 +13,50 @@ import {
 import { LinkContainer } from "react-router-bootstrap";
 import cart from "../assets/img/Cart.png";
 import logo from "../assets/img/logo.png";
+import { authenticationService } from '../services/authentication';
 
 export default class Header extends Component {
+
+  isLogin = () => {
+    const currentUser = authenticationService.currentUser;
+    if (!currentUser) {
+      return (
+        <>
+          <LinkContainer to="/login">
+            <Button
+              className="px-2 py-1 mr-1 medium-label d-inline"
+            >
+              Login
+            </Button>
+          </LinkContainer>
+          <LinkContainer to="/daftar">
+            <Button
+              className="px-2 py-1 medium-label d-inline"
+            >
+              Daftar
+            </Button>
+          </LinkContainer>
+        </>
+      )
+    }
+    return (
+      <NavDropdown title={"Hi, " + JSON.parse(currentUser).nama} id="basic-nav-dropdown">
+        <LinkContainer className="small-label" to="/status">
+          <NavDropdown.Item>Status Transaksi</NavDropdown.Item>
+        </LinkContainer>
+        <LinkContainer className="small-label" to="/profil">
+          <NavDropdown.Item>Profil</NavDropdown.Item>
+        </LinkContainer>
+        <LinkContainer
+          className="small-label dropdown-logout"
+          to="/logout"
+        >
+          <NavDropdown.Item>Log Out</NavDropdown.Item>
+        </LinkContainer>
+      </NavDropdown>
+    )
+  }
+
   render() {
     return (
       <Navbar fixed="top" className="py-3 medium-label" bg="light" expand="lg">
@@ -59,20 +101,7 @@ export default class Header extends Component {
               </LinkContainer>
             </Col>
             <Col>
-              <NavDropdown title="Hi, nama orang" id="basic-nav-dropdown">
-                <LinkContainer className="small-label" to="/status">
-                  <NavDropdown.Item>Status Transaksi</NavDropdown.Item>
-                </LinkContainer>
-                <LinkContainer className="small-label" to="/profil">
-                  <NavDropdown.Item>Profil</NavDropdown.Item>
-                </LinkContainer>
-                <LinkContainer
-                  className="small-label dropdown-logout"
-                  to="/logout"
-                >
-                  <NavDropdown.Item>Log Out</NavDropdown.Item>
-                </LinkContainer>
-              </NavDropdown>
+              {this.isLogin()}
             </Col>
           </Row>
         </Container>

@@ -5,7 +5,7 @@ import Currency from '../../Currency'
 import Text from './Text'
 
 export default function CartItem(props) {
-  const { jumlah, funct, del, user } = props;
+  const { jumlah, funct, del, user, setValid } = props;
   console.log('jumlah', jumlah)
   const [count, setCount] = useState(jumlah);
   let errorClass = '';
@@ -24,6 +24,7 @@ export default function CartItem(props) {
     if ((count - 1) > 0) {
       setCount(count - 1);
       funct(count - 1, user, props.id_produk);
+      if (count > props.qty) { setValid(true) }
     }
   }
   function dels() {
@@ -32,6 +33,7 @@ export default function CartItem(props) {
 
   function errorMessage() {
     if (count > props.qty) {
+      setValid(false);
       errorClass = 'error-cart';
       return (
         <Card.Footer className='p-0 m-0 rounded-0 rounded-bottom'>

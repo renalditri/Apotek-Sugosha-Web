@@ -3,13 +3,14 @@ import { Container, Table, Row, Col, Card, Button, ButtonGroup, Form } from 'rea
 import { BrowserRouter as Router, useParams, useRouteMatch } from "react-router-dom";
 import { Text, Breadcrumb } from '../components/parts';
 import Currency from '../Currency';
+import { authenticationService } from '../services/authentication';
 
 let pathDefault = [
   { name: 'Home', to: '/' },
   { name: 'Katalog Produk', to: '/produk' },
 ]
 
-const user_id = 1;
+const user_id = authenticationService.user_id;
 
 export default function ProductDetail(props) {
   const { productID, kategoriID } = useParams();

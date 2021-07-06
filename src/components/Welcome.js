@@ -14,10 +14,7 @@ export default class Welcome extends Component {
             <LinkContainer to="/produk">
               <Button
                 className="px-4 py-2 mr-3 mt-3 large-label"
-                style={{
-                  display:
-                    'inline'
-                }}
+                style={{ display: 'inline' }}
               >
                 Cari Obat
             </Button>
@@ -26,10 +23,7 @@ export default class Welcome extends Component {
               <Button
                 variant="no-outline-primary"
                 className="px-4 py-2 mt-3 large-label"
-                style={{
-                  display:
-                    'inline'
-                }}
+                style={{ display: 'inline' }}
               >
                 Tebus Resep
             </Button>

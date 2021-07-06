@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { Container, Row, Col, Form, Card, Button } from 'react-bootstrap';
 import { Text } from '../components/parts'
+import { authenticationService } from '../services/authentication';
 
-const user_id = 1;
+const user_id = authenticationService.user_id;
 
 function Resep(props) {
   const [img, setImg] = useState()

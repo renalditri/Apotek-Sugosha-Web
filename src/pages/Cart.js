@@ -4,21 +4,26 @@ import plCarts from '../assets/data/Carts.Data';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import Currency from '../Currency';
 import { LinkContainer } from 'react-router-bootstrap';
+import { authenticationService } from '../services/authentication';
 
-const user_id = 1;
+const user_id = authenticationService.user_id;
 let update = false;
 
 export default function Cart() {
   const [carts, setCarts] = useState(plCarts);
-
+  const [valid, setValid] = useState(true);
   useEffect(() => {
     fetch('http://localhost:4000/keranjang/' + user_id)
       .then(res => res.json())
       .then(res => {
-        res.produk.map(r => {
-          r.img_path = 'http://localhost:4000/' + r.img_path;
-        })
-        setCarts(res);
+        if (!res.message) {
+          res.produk.map(r => {
+            r.img_path = 'http://localhost:4000/' + r.img_path;
+          })
+          setCarts(res);
+          return;
+        }
+        setCarts({ produk: [] })
       })
   }, [])
 
@@ -32,26 +37,26 @@ export default function Cart() {
         jumlah: count
       })
     })
-    .then(res => {
-      console.log(res);
-      update = !update;
-    })
-    .catch(err => {
-      console.log('Err: ', err);
-    })
+      .then(res => {
+        console.log(res);
+        update = !update;
+      })
+      .catch(err => {
+        console.log('Err: ', err);
+      })
   }
 
   const deleteCart = (user_id, product_id) => {
     fetch(`http://localhost:4000/keranjang/${user_id}/${product_id}`, {
       method: 'DELETE',
     })
-    .then(res => {
-      console.log(res);
-      update = !update;
-    })
-    .catch(err => {
-      console.log('Err: ', err);
-    })
+      .then(res => {
+        console.log(res);
+        update = !update;
+      })
+      .catch(err => {
+        console.log('Err: ', err);
+      })
   }
 
   return (
@@ -83,6 +88,8 @@ export default function Cart() {
       return x;
     }
 
+    console.log(valid);
+
     return (
       <Card className="p-3">
         <Text className="mb-3" type="large-label">Ringkasan Keranjang</Text>
@@ -94,7 +101,11 @@ export default function Cart() {
           <Text green type="large-label" style={{ float: "left" }}>Total Harga</Text>
           <Text green type="large-label" style={{ float: "right" }}>{Currency.format(items().harga)}</Text>
         </div>
-        <LinkContainer to="/checkout"><Button className="mt-3 w-100">Checkout</Button></LinkContainer>
+        {(carts.produk.length > 0 && valid) ?
+          <LinkContainer to="/checkout"><Button className="mt-3 w-100">Checkout</Button></LinkContainer>
+          :
+          <Button disabled className="mt-3 w-100">Checkout</Button>
+        }
       </Card>
     )
   }
@@ -102,7 +113,7 @@ export default function Cart() {
   function cartItems() {
     return carts.produk.map((cart, i) => {
       return (
-        <CartItem {...cart} key={"item-" + i} funct={changeCount} del={deleteCart} user={user_id} />
+        <CartItem {...cart} key={"item-" + i} setValid={setValid} funct={changeCount} del={deleteCart} user={user_id} />
       )
     })
   }

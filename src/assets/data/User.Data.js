@@ -1,8 +1,8 @@
 const userSavedData = {
-  nama: 'Putu Wira',
-  nomor: '0818293728',
+  nama: 'Nama Pembeli',
+  nomor_telepon: '08xxxxxxxxx',
   kota: 'Denpasar',
-  alamat: 'Jalan Dingin nomor 1',
+  alamat: 'Alamat Pembeli',
 }
 
 export default userSavedData;

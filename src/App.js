@@ -19,9 +19,9 @@ import {
   DetailTransaksi,
   Login,
   Daftar,
+  Logout
 } from "./pages";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
+import { Header, Footer, PrivateRoute } from './components';
 import NestingExample from "./example";
 
 function App() {
@@ -30,7 +30,8 @@ function App() {
   return (
     <Router>
       <Switch>
-        <Route exact path="/checkout" component={withoutNavbar} />
+        <PrivateRoute path="/logout" component={Logout} />
+        <PrivateRoute path="/checkout" component={withoutNavbar} />
         <Route component={withNavbar} />
       </Switch>
     </Router>
@@ -44,7 +45,7 @@ function App() {
           <ScrollToTop />
           <Route exact path="/" component={Home} />
           <Route exact path="/login" component={Login} />
-          <Route exact path="/Daftar" component={Daftar} />
+          <Route exact path="/daftar" component={Daftar} />
           <Route
             exact
             path={`/kategori/:kategoriID/:productID`}
@@ -54,12 +55,12 @@ function App() {
           <Route exact path={`/kategori/:kategoriID`} component={Category} />
           <Route exact path="/kategori" component={Categories} />
           <Route exact path="/produk" component={Product} />
-          <Route exact path="/profil" component={Profile} />
-          <Route exact path="/resep" component={Resep} />
+          <PrivateRoute exact path="/profil" component={Profile} />
+          <PrivateRoute exact path="/resep" component={Resep} />
           <Route exact path="/example" component={NestingExample} />
-          <Route exact path="/cart" component={Cart} />
-          <Route exact path="/status" component={StatusTransaksi} />
-          <Route exact path={`/status/:statusID`} component={DetailTransaksi} />
+          <PrivateRoute exact path="/cart" component={Cart} />
+          <PrivateRoute exact path="/status" component={StatusTransaksi} />
+          <PrivateRoute exact path={`/status/:statusID`} component={DetailTransaksi} />
           <Footer />
         </div>
       </>
@@ -71,7 +72,8 @@ function App() {
       <>
         <div ref={myRef} className="checkoutContainer">
           <ScrollToTop />
-          <Route path="/checkout" component={Checkout} />
+          <Route exact path="/checkout" component={Checkout} />
+          <Route path="/checkout/:nomorTR" component={Checkout} />
           <Footer />
         </div>
       </>
