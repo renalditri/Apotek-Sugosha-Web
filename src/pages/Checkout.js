@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { _CardDeck, Text, CheckoutCard } from '../components/parts';
+import { Header, Footer } from '../components'
 import { Row, Col, Container, Form, Card, Button, Table } from 'react-bootstrap';
 import { BrowserRouter as Router, Link, useParams } from "react-router-dom";
 import plCarts from '../assets/data/Carts.Data';
 import plUserData from '../assets/data/User.Data';
 import Currency from '../Currency';
 import { authenticationService } from '../services/authentication';
+import { LinkContainer } from 'react-router-bootstrap';
 
 const user_id = authenticationService.user_id;
 const base_url = 'http://localhost:4000'
@@ -15,29 +17,43 @@ export default function Checkout(props) {
   const [userData, setUserData] = useState(plUserData);
   const { nomorTR } = useParams();
   const [dataTransaksi, setData] = useState(plCarts);
+  const [nomorTransaksi, setNomorTR] = useState(nomorTR ?? '');
   const [dataPengiriman, setDataPengiriman] = useState();
+  const Swal = require("sweetalert2");
 
   useEffect(() => {
-    fetch('http://localhost:4000/pembeli/' + user_id)
-      .then(res => res.json())
-      .then(res => {
-        console.log(res);
-        setUserData(res);
-        const url = (nomorTR) ? `${base_url}/transaksi/${nomorTR}` : `${base_url}/keranjang/${user_id}`;
-        return fetch(url)
-      })
+    const { token, ...user } = JSON.parse(authenticationService.currentUser);
+    setUserData(user);
+    const url = (nomorTR) ? `${base_url}/transaksi/${nomorTR}` : `${base_url}/keranjang/${user_id}`;
+    fetch(url)
       .then(res => res.json())
       .then(res => {
         if (res.status) {
           if (res.status !== 1 || res.jenis !== 1) {
-            alert('Anda tidak dapat mengakses transaksi ini!');
-            props.history.push('/');
+            Swal.fire({
+              icon: "error",
+              title: "Gagal",
+              text: "Anda tidak dapat mengakses transaksi ini!",
+              showConfirmButton: false,
+              timer: 1800,
+            });
+            setTimeout(function () {
+              props.history.push('/');
+            }, 1800);
             return;
           }
         }
         if (user_id !== res.id_pembeli) {
-          alert('Anda tidak dapat mengakses transaksi ini!');
-          props.history.push('/');
+          Swal.fire({
+            icon: "error",
+            title: "Gagal",
+            text: "Anda tidak dapat mengakses transaksi ini!",
+            showConfirmButton: false,
+            timer: 1800,
+          });
+          setTimeout(function () {
+            props.history.push('/');
+          }, 1800);
           return;
         }
         console.log(res);
@@ -46,25 +62,33 @@ export default function Checkout(props) {
   }, [])
 
   return (
-    <Container>
-      <Row className="mt-3">
-        <Col>
-          <BackButton />
-          <h1>Proses Checkout</h1>
-          {(!nomorTR) ? '' :
-            <Text type="subtitle-1">Nomor Transaksi: {nomorTR}</Text>
-          }
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <ProgressBar currentStep={stepCounter} />
-        </Col>
-      </Row>
-      <FirstPage currentStep={stepCounter} onClick={() => next()} data={userData} />
-      <SecondPage currentStep={stepCounter} onClick={() => next()} data={dataTransaksi} />
-      <ThirdPage currentStep={stepCounter} onClick={() => next()} />
-    </Container>
+    <>
+      {(stepCounter == 4) ? <Header /> : ''}
+      <Container className={(stepCounter == 4) ? 'mb-0 pb-0' : ''}>
+        {(stepCounter < 4) ? (
+          <>
+            <Row className="mt-3">
+              <Col>
+                <BackButton />
+                <h1>Proses Checkout</h1>
+                {(!nomorTR) ? '' :
+                  <Text type="subtitle-1">Nomor Transaksi: {nomorTR}</Text>
+                }
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+                <ProgressBar currentStep={stepCounter} />
+              </Col>
+            </Row>
+          </>
+        ) : ''}
+        <FirstPage currentStep={stepCounter} onClick={() => next()} data={userData} />
+        <SecondPage currentStep={stepCounter} onClick={() => next()} data={dataTransaksi} />
+        <ThirdPage currentStep={stepCounter} onClick={() => next()} />
+        <FinishedPage currentStep={stepCounter} nomorTransaksi={nomorTransaksi} />
+      </Container>
+    </>
   )
 
   function BackButton() {
@@ -136,6 +160,7 @@ export default function Checkout(props) {
 
   function ProgressBar(props) {
     const { currentStep } = props;
+    if (currentStep == 4) { return null; }
     let class1 = (currentStep > 1) ? 'progress-item bar-active' : 'progress-item';
     let class2 = (currentStep > 2) ? 'progress-item bar-active' : 'progress-item';
     return (
@@ -194,7 +219,13 @@ export default function Checkout(props) {
         }
       })
       if (pesan.length > 0) {
-        alert(`Mohon isi ${pesan.join(' dan ')} anda`);
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: `Mohon isi ${pesan.join(' dan ')} anda`,
+          showConfirmButton: false,
+          timer: 1800,
+        });
         return;
       }
 
@@ -210,8 +241,13 @@ export default function Checkout(props) {
           },
           body: JSON.stringify({ saved_data: JSON.stringify(bodySavedData) })
         })
-          .then(res => console.log(res))
+          .then(res => res.json())
           .then(res => {
+            const { token, ...local_data } = JSON.parse(authenticationService.currentUser);
+            const new_data = res;
+            local_data.saved_data = JSON.parse(new_data.saved_data);
+            console.log('MASUKIN STORAGE', local_data);
+            localStorage.setItem('currentUser', JSON.stringify({ token: token, ...local_data }));
             setDataPengiriman({
               nama: nama,
               nomor_telepon: nomor_telepon,
@@ -219,7 +255,6 @@ export default function Checkout(props) {
               alamat: alamat,
               kurir: kurir
             })
-            alert(dataTransaksi)
             next();
           })
       } else {
@@ -228,9 +263,8 @@ export default function Checkout(props) {
           nomor_telepon: nomor_telepon,
           kota: kota,
           alamat: alamat,
-          kurir: kurir
+          pengiriman: kurir
         })
-        alert(dataTransaksi)
         next();
       }
     }
@@ -420,7 +454,13 @@ export default function Checkout(props) {
 
     const sendTransaksi = () => {
       if (!img) {
-        alert('Masukkan gambar bukti transaksi terlebih dahulu');
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: 'Masukkan gambar bukti transaksi terlebih dahulu',
+          showConfirmButton: false,
+          timer: 1800,
+        });
         return;
       }
       const formData = new FormData();
@@ -444,36 +484,43 @@ export default function Checkout(props) {
           },
           status: 2,
           jenis: 0,
-          produk: dataTransaksi.produk.map(p => { return {id_produk: p.id_produk, jumlah: p.jumlah} })
+          produk: dataTransaksi.produk.map(p => { return { id_produk: p.id_produk, jumlah: p.jumlah } })
         }
         console.log(JSON.stringify(dataSend));
         fetch(base_url + '/transaksi', {
           method: 'POST',
           headers: {
-            "Content-Type" : "application/json"
+            "Content-Type": "application/json"
           },
           body: JSON.stringify(dataSend),
         })
-        .then(res => res.json())
-        .then(res => {
-          if(res.id) {
-            formData.append("nomor_transaksi", res.id);
-            formData.append("bukti", img);
-            return fetch(base_url + '/upload/bukti', {
-              method: 'POST',
-              body: formData,
-            })
-          }
-          console.log(res);
-        })
-        .then(res => res.json())
-        .then(res => {
-          console.log(res);
-          alert('Transaksi telah dilakukan');
-          return fetch(base_url + '/keranjang/' + user_id, { method: 'DELETE' })
-        })
-        .then(res => { onClick() })
-        .catch(err => console.log(err))
+          .then(res => res.json())
+          .then(res => {
+            if (res.id) {
+              formData.append("nomor_transaksi", res.id);
+              setNomorTR(res.id);
+              formData.append("bukti", img);
+              return fetch(base_url + '/upload/bukti', {
+                method: 'POST',
+                body: formData,
+              })
+            }
+            console.log(res);
+          })
+          .then(res => res.json())
+          .then(res => {
+            console.log(res);
+            Swal.fire({
+              icon: "success",
+              title: "Berhasil",
+              text: "Transaksi telah dilakukan",
+              showConfirmButton: false,
+              timer: 1800,
+            });
+            return fetch(base_url + '/keranjang/' + user_id, { method: 'DELETE' })
+          })
+          .then(res => { onClick() })
+          .catch(err => console.log(err))
       }
     }
 
@@ -534,11 +581,46 @@ export default function Checkout(props) {
           };
           reader.readAsDataURL(file);
         } else {
-          alert('Besar file gambar tidak boleh melebihi 4 MB')
+          Swal.fire({
+            icon: "error",
+            title: "Gagal",
+            text: "Besar file gambar tidak boleh melebihi 4 MB",
+            showConfirmButton: false,
+            timer: 1800,
+          });
         }
       }
     }
   }
 
+  function FinishedPage(props) {
+    const { currentStep, nomorTransaksi } = props;
+
+    if (currentStep !== 4) return null;
+    return (
+      <Row className="h-100" style={{ minHeight: '65vh', marginTop: '8rem' }}>
+        <Col className="text-center h-100 w-100">
+          <svg width="154" height="154" viewBox="0 0 154 154" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="76.8" cy="76.8" r="76.8" fill="#25B013" />
+            <path d="M43.2002 79.5058L70.3531 106.659L124.659 52.3529"
+              stroke="#FCFCFC" stroke-width="8" stroke-linecap="round" />
+          </svg>
+          <h2 className="mt-3">Checkout Berhasil</h2>
+          <p className="body-text">
+            Terimakasih sudah melakukan pemesanan obat di Apotek Sugosha.
+            Pesanan anda <br /> dengan  <b>Nomor transaksi : {nomorTransaksi}</b>  akan segera kami proses
+          </p>
+          <LinkContainer to='/status'>
+            <Button
+              className="mt-4 px-3 py-2 large-label"
+              style={{ fontSize: '18px', borderRadius: '8px' }}
+            >
+              Cek Status Transaksi
+            </Button>
+          </LinkContainer>
+        </Col>
+      </Row>
+    )
+  }
 
 }

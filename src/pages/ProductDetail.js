@@ -13,6 +13,7 @@ let pathDefault = [
 const user_id = authenticationService.user_id;
 
 export default function ProductDetail(props) {
+  const Swal = require("sweetalert2");
   const { productID, kategoriID } = useParams();
   const { url } = useRouteMatch();
   const [product, setProduct] = useState({
@@ -61,6 +62,15 @@ export default function ProductDetail(props) {
   }, [pathDefault])
 
   function addCart(total) {
+    if(!user_id) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal',
+        text: 'Anda perlu Log In terlebih dahulu'
+      })
+      return;
+    }
+
     let cart = {
       id_pembeli: user_id,
       id_produk: productID,
@@ -75,11 +85,19 @@ export default function ProductDetail(props) {
     })
     .then(res => {
       console.log(res);
-      alert('Berhasil menambahkan barang ke keranjang!');
+      Swal.fire({
+        icon: 'success',
+        title: 'Berhasil',
+        text: 'Produk berhasil dimasukkan ke dalam keranjang'
+      })
     })
     .catch(err => {
       console.log('Err: ', err);
-      alert('Gagal menambahkan barang ke keranjang')
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal',
+        text: 'Terjadi kesalahan saat menambahkan produk'
+      })
     })
   }
 
@@ -106,7 +124,7 @@ export default function ProductDetail(props) {
 function DeskripsiObat(props) {
   return (
     <Card className={"shadow border-0 p-3"}>
-      <Text type="large-label" style={{ color: '#4E4B66;' }}>Informasi Obat</Text>
+      <Text type="large-label" style={{ color: '#4E4B66' }}>Informasi Obat</Text>
       <Table className="body-text mt-3">
         <tbody>
           {

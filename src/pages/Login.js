@@ -29,6 +29,7 @@ function Login(props) {
       authenticationService.login(NoHP, password)
       .then( user => {
         console.log(user);
+        window.location.reload();
         Swal.fire({
           icon: "success",
           title: "Berhasil",
@@ -63,19 +64,8 @@ function Login(props) {
   };
   return (
     <Container>
-      <h1>Login</h1>
+      <h1 className="ml-5">Login</h1>
       <div className="logincontainer mx-auto">
-        <Button
-          variant="outline-dark"
-          size="lg"
-          block
-          className="mb-3 button_login"
-        >
-          <b>Login Dengan Google</b>
-        </Button>
-        <div class="separator" style={{ color: "##6E7191" }}>
-          Atau
-        </div>
         <Form.Group>
           <Form.Label>No. Handphone</Form.Label>
           <Form.Control

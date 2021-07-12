@@ -31,6 +31,11 @@ export default function Categories() {
     })
   }, []);
 
+  const isReverse = (e) => {
+    console.log(e.target.value);
+    setCategoryList([...categoryList.reverse()])
+  }
+
   function search(e, categories) {
     console.log(e.target.value);
     setCategoryList(categories.filter(category => {
@@ -60,7 +65,12 @@ export default function Categories() {
           <Text style={{ fontWeight: 'bold' }} type="body">Urutkan</Text>
         </Col>
         <Col xs={3}>
-          <Form.Control className="body-text" as="select" custom>
+          <Form.Control 
+          className="body-text" 
+          as="select" 
+          custom
+          onChange={(e) => { isReverse(e) }}
+          >
             <option>Urutkan nama A-Z</option>
             <option>Urutkan nama Z-A</option>
           </Form.Control>

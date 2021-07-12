@@ -53,10 +53,16 @@ export default function Category(props) {
     })
   }, [kategoriID])
 
+  
+  const isReverse = (e) => {
+    console.log(e.target.value);
+    setProductList([...product.reverse()])
+  }
+
   if (category) {
     return (
       <Container>
-        <Breadcrumb className="mt-3" url={path} current={current} />
+        <Breadcrumb className="mt-5" url={path} current={current} />
         <Row className="mt-3">
           <Col md={3}>
             <Sidebar url={kategoriID} categories={allCategory} />
@@ -74,11 +80,9 @@ export default function Category(props) {
                 <Text style={{ fontWeight: 'bold' }} type="body">Urutkan</Text>
               </Col>
               <Col md={4}>
-                <Form.Control className="body-text" as="select" custom>
+                <Form.Control className="body-text" as="select" onChange={(e) => {isReverse(e)}} custom>
                   <option>Urutkan nama A-Z</option>
                   <option>Urutkan nama Z-A</option>
-                  <option>Pembelian Terbanyak</option>
-                  <option>Ulasan Terbanyak</option>
                 </Form.Control>
               </Col>
             </Row>

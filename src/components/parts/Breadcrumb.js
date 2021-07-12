@@ -6,17 +6,17 @@ export default function Breadcrumb(props) {
   return (
     <div className={className.join(" ")}>
       {previousUrl()}
-      <Text inline type="large-label">{props.current}</Text>
+      <Text key="breadcrumb" inline type="large-label">{props.current}</Text>
     </div>
   )
 
   function previousUrl() {
     return props.url.map((item, i) => {
       return (
-        <>
-          <Text key={'bread-'+i} keyProp={i} inline green isLink type="large-label" to={item.to}>{item.name}</Text>
-          <Text key={'crumb-'+i} keyProp={i+1} inline type="large-label"> / </Text>
-        </>
+        <span key={i}>
+          <Text key={'bread-'+i} keyProp={i+1} inline green isLink type="large-label" to={item.to}>{item.name}</Text>
+          <Text key={'crumb-'+i} keyProp={i+2} inline type="large-label"> / </Text>
+        </span>
       )
     })
   }

@@ -27,6 +27,34 @@ export default function StatusTransaksi() {
   const [filterJenis, setFilterJenis] = useState(jenisCode.SEMUA);
   const [statusTransaksi, setStatusTransaksi] = useState(plStatusTransaksi);
 
+   /* fungsi date and time */
+   function convertdate(date_str) {
+    let tanggal = new Date(date_str);
+    let yr, mn, dt, hr, mnt, sec;
+    tanggal.setHours(tanggal.getHours() + 0);
+    yr = tanggal.getFullYear();
+    tanggal.setMonth(tanggal.getMonth() + 1);
+    mn = tanggal.getMonth().toString();
+
+    if (mn.length < 2) {
+      mn = "0" + mn;
+    }
+    dt = tanggal.getDate().toString();
+    if (dt.length < 2) {
+      dt = "0" + dt;
+    }
+    hr = tanggal.getHours().toString();
+    if (hr.length < 2) {
+      hr = "0" + hr;
+    }
+    mnt = tanggal.getMinutes().toString();
+    if (mnt.length < 2) {
+      mnt = "0" + mnt;
+    }
+
+    return `${yr}-${mn}-${dt} ${hr}:${mnt} WITA`;
+  }
+
   useEffect(() => {
     fetch(`http://localhost:4000/transaksi/pembeli/${user_id}`)
       .then(res => res.json())
@@ -40,9 +68,17 @@ export default function StatusTransaksi() {
               if (r.img_path) { r.img_path = 'http://localhost:4000/' + r.img_path }
             })
           }
+          res.tanggal = convertdate(res.tanggal);
         })
+        console.log(resolve)
         setStatusTransaksi(resolve);
       })
+      .catch(err => {
+        setStatusTransaksi([]);
+        console.log(err)
+      })
+
+    console.log('tes')
   }, [])
 
   return (

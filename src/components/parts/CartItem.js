@@ -5,7 +5,7 @@ import Currency from '../../Currency'
 import Text from './Text'
 
 export default function CartItem(props) {
-  const { jumlah, funct, del, user, setValid } = props;
+  const { jumlah, funct, del, user, setValid, i } = props;
   console.log('jumlah', jumlah)
   const [count, setCount] = useState(jumlah);
   let errorClass = '';
@@ -17,13 +17,13 @@ export default function CartItem(props) {
   function adds() {
     if ((count + 1) <= props.qty) {
       setCount(count + 1);
-      funct(count + 1, user, props.id_produk);
+      funct(i, count + 1, user, props.id_produk);
     }
   }
   function subs() {
     if ((count - 1) > 0) {
       setCount(count - 1);
-      funct(count - 1, user, props.id_produk);
+      funct(i, count - 1, user, props.id_produk);
       if (count > props.qty) { setValid(true) }
     }
   }

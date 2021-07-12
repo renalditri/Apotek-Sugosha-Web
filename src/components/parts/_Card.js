@@ -8,7 +8,7 @@ export default function _Card(props) {
   if (props.type === 'product') {
     return (
       <Link className="card-link" to={props.href}>
-        <Card className="product-card" key={'product-card-' + props.id}>
+        <Card className="product-card mt-3" key={'product-card-' + props.id}>
           <Card.Img className="product-img" key={'product-card-img-' + props.id} src={process.env.PUBLIC_URL + props.src} />
           <Card.Body key={'product-card-body-' + props.id}>
             <Card.Title key={'product-card-title-' + props.id}>
@@ -26,7 +26,7 @@ export default function _Card(props) {
 
   return (
     <Link to={props.href}>
-      <Card className="category-card" key={'card-' + props.id}>
+      <Card className="category-card mt-3" key={'card-' + props.id}>
         <Card.Img className="category-img" key={'card-img-' + props.id} src={props.src} />
         <Card.Body key={'card-body-' + props.id}>
           <Text type="medium-label" className="text-center" key={'card-title-' + props.id}>{props.title}</Text>

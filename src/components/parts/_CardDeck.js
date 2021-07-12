@@ -7,6 +7,8 @@ import Currency from '../../Currency';
 export default function _CardDeck(props) {
   const { xs = false, sm = false, md = false, lg= false, xl = false, type="category" } = props;
 
+  console.log('cardlist', props.array)
+
   if(type == 'product') {
     return props.array.map(item => {
       return (

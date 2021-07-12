@@ -5,10 +5,14 @@ import categories from '../assets/data/Categories.Data';
 import products from '../assets/data/Products.Data';
 import { BrowserRouter as Router, Link } from "react-router-dom";
 import { _CardDeck, Text } from '../components/parts'
+import { authenticationService } from '../services/authentication';
 
-function Home() {
+
+function Home(props) {
   const [categoryList, setCategoryList] = useState(categories);
   const [productList, setProductList] = useState(products);
+  const currentUser = authenticationService.currentUser;
+  const Swal = require("sweetalert2");
 
   useEffect(() => {
     let dataFetch = {};
@@ -28,7 +32,7 @@ function Home() {
         dataFetch.category = arr;
       })
       .then(res => {
-        return fetch('http://localhost:4000/produk');
+        return fetch('http://localhost:4000/top');
       })
       .then(res => res.json())
       .then(res => {
@@ -36,11 +40,21 @@ function Home() {
           r.id = r.id_produk;
           r.img_path = 'http://localhost:4000/' + r.img_path
         })
-        dataFetch.product = res.slice(0, 4);
+        dataFetch.product = res;
       })
       .then(res => {
         setCategoryList(dataFetch.category);
         setProductList(dataFetch.product);
+        if (props.history.location.state) {
+          console.log(props.history.location.state)
+          if (props.history.location.state.from.pathname == "/resep" && !currentUser) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Gagal',
+              text: 'Anda perlu Log In terlebih dahulu'
+            })
+          }
+        }
       })
       .catch(err => {
         console.error('Error: ', err)

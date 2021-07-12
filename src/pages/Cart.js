@@ -5,30 +5,34 @@ import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import Currency from '../Currency';
 import { LinkContainer } from 'react-router-bootstrap';
 import { authenticationService } from '../services/authentication';
+import config from '../config.json'
 
 const user_id = authenticationService.user_id;
-let update = false;
 
-export default function Cart() {
+export default function Cart(props) {
   const [carts, setCarts] = useState(plCarts);
   const [valid, setValid] = useState(true);
+  const Swal = require("sweetalert2");
   useEffect(() => {
-    fetch('http://localhost:4000/keranjang/' + user_id)
+    fetch(config.base_url + `/keranjang/${user_id}`)
       .then(res => res.json())
       .then(res => {
         if (!res.message) {
           res.produk.map(r => {
-            r.img_path = 'http://localhost:4000/' + r.img_path;
+            r.img_path = config.base_url + '/' + r.img_path;
           })
-          setCarts(res);
+          setCarts({ ...res });
           return;
         }
         setCarts({ produk: [] })
       })
   }, [])
 
-  const changeCount = (count, user_id, product_id) => {
-    fetch(`http://localhost:4000/keranjang/${user_id}/${product_id}`, {
+  const changeCount = (i, count, user_id, product_id) => {
+    console.log('product: ' + i);
+    const new_carts = { ...carts }
+    console.log(carts);
+    fetch(config.base_url + `/keranjang/${user_id}/${product_id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -37,9 +41,11 @@ export default function Cart() {
         jumlah: count
       })
     })
+      .then(res => res.json())
       .then(res => {
         console.log(res);
-        update = !update;
+        new_carts.produk[i].jumlah = res.jumlah;
+        setCarts({ ...new_carts });
       })
       .catch(err => {
         console.log('Err: ', err);
@@ -47,12 +53,30 @@ export default function Cart() {
   }
 
   const deleteCart = (user_id, product_id) => {
-    fetch(`http://localhost:4000/keranjang/${user_id}/${product_id}`, {
+    fetch(config.base_url + `/keranjang/${user_id}/${product_id}`, {
       method: 'DELETE',
     })
       .then(res => {
+        Swal.fire({
+          icon: "success",
+          title: "Berhasil",
+          text: "Barang berhasil dihapus dari keranjang",
+          showConfirmButton: false,
+          timer: 1500,
+        });
         console.log(res);
-        update = !update;
+        return fetch(config.base_url + `/keranjang/${user_id}`)
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (!res.message) {
+          res.produk.map(r => {
+            r.img_path = config.base_url + '/' + r.img_path;
+          })
+          setCarts({ ...res });
+          return;
+        }
+        setCarts({ produk: [] })
       })
       .catch(err => {
         console.log('Err: ', err);
@@ -71,14 +95,14 @@ export default function Cart() {
           {cartItems()}
         </Col>
         <Col md={4}>
-          <CheckoutCard products={carts.produk} />
+          {CheckoutCard()}
         </Col>
       </Row>
     </Container>
   )
 
-  function CheckoutCard(props) {
-    const { products } = props;
+  function CheckoutCard() {
+    const products = carts.produk;
     const items = () => {
       let x = { jumlah: 0, harga: 0, };
       products.forEach((cart) => {
@@ -113,7 +137,7 @@ export default function Cart() {
   function cartItems() {
     return carts.produk.map((cart, i) => {
       return (
-        <CartItem {...cart} key={"item-" + i} setValid={setValid} funct={changeCount} del={deleteCart} user={user_id} />
+        <CartItem {...cart} key={"item-" + i} i={i} setValid={setValid} funct={changeCount} del={deleteCart} user={user_id} />
       )
     })
   }

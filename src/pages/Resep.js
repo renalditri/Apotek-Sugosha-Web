@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Container, Row, Col, Form, Card, Button } from 'react-bootstrap';
 import { Text } from '../components/parts'
 import { authenticationService } from '../services/authentication';
+const Swal = require("sweetalert2");
 
 const user_id = authenticationService.user_id;
 
@@ -11,7 +12,13 @@ function Resep(props) {
   const postResep = () => {
     if(!img) {
       console.log(img);
-      alert('Isi gambar terlebih dahulu')
+      Swal.fire({
+        icon: "error",
+        title: "Gagal",
+        text: 'Masukkan gambar resep terlebih dahulu',
+        showConfirmButton: false,
+        timer: 1800,
+      });
     } else {
       const formData = new FormData();
       formData.append("id_pembeli", user_id);
@@ -26,16 +33,34 @@ function Resep(props) {
       .then(res => {
         if(res.status == 200) {
           console.log(res);
-          alert('Resep berhasil dikirim!');
+          Swal.fire({
+            icon: "success",
+            title: "Berhasil",
+            text: "Resep berhasil dikirim",
+            showConfirmButton: false,
+            timer: 1800,
+          });
           props.history.push('/');
         } else {
           console.log(res);
-          alert('Resep gagal terkirim');
+          Swal.fire({
+            icon: "error",
+            title: "Gagal",
+            text: 'Terdapat masalah saat pengiriman gambar resep',
+            showConfirmButton: false,
+            timer: 1800,
+          });
         }
       })
       .catch(err => {
         console.log('Err: ', err);
-        alert('Resep gagal terkirim');
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: 'Terdapat masalah saat pengiriman gambar resep',
+          showConfirmButton: false,
+          timer: 1800,
+        });
       })
     }
   }
@@ -100,7 +125,13 @@ function ImageInput(props) {
       };
       reader.readAsDataURL(file);
     } else {
-      alert('Besar file gambar tidak boleh melebihi 4 MB')
+      Swal.fire({
+        icon: "error",
+        title: "Gagal",
+        text: "Besar file gambar tidak boleh melebihi 4 MB",
+        showConfirmButton: false,
+        timer: 1800,
+      });
     }
   }
 }

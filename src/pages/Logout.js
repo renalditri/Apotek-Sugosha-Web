@@ -5,6 +5,7 @@ import { authenticationService } from "../services/authentication"
 function Logout(props) {
   if(authenticationService.currentUser) {
     authenticationService.logout();
+    window.location.reload();
   }
   
   return (
