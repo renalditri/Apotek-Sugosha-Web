@@ -61,6 +61,11 @@ export default function Checkout(props) {
       })
   }, [])
 
+  
+  const chgTrxNbr = (transactionNumber) => {
+    return `TRX${transactionNumber.toString().padStart(4, '0')}`;
+  }
+
   return (
     <>
       {(stepCounter == 4) ? <Header /> : ''}
@@ -72,7 +77,7 @@ export default function Checkout(props) {
                 <BackButton />
                 <h1>Proses Checkout</h1>
                 {(!nomorTR) ? '' :
-                  <Text type="subtitle-1">Nomor Transaksi: {nomorTR}</Text>
+                  <Text type="subtitle-1">Nomor Transaksi: {chgTrxNbr(nomorTR)}</Text>
                 }
               </Col>
             </Row>
@@ -193,7 +198,7 @@ export default function Checkout(props) {
     const [kota, setKota] = useState('');
     const [alamat, setAlamat] = useState();
     const [simpan, setSimpan] = useState(false);
-    const [kurir, setKurir] = useState(gojek);
+    const [pengiriman, setPengiriman] = useState(gojek);
 
     useEffect(() => {
       if (data.nomor_telepon == '08xxxxxxxxx') { return; }
@@ -253,7 +258,7 @@ export default function Checkout(props) {
               nomor_telepon: nomor_telepon,
               kota: kota,
               alamat: alamat,
-              kurir: kurir
+              pengiriman: pengiriman
             })
             next();
           })
@@ -263,7 +268,7 @@ export default function Checkout(props) {
           nomor_telepon: nomor_telepon,
           kota: kota,
           alamat: alamat,
-          pengiriman: kurir
+          pengiriman: pengiriman
         })
         next();
       }
@@ -328,7 +333,7 @@ export default function Checkout(props) {
                   <Col>
                     <Form.Label>Kurir</Form.Label>
                     <Form.Control
-                      onChange={(e) => { setKurir(e.target.value) }}
+                      onChange={(e) => { setPengiriman(e.target.value) }}
                       className="body-text"
                       as="select"
                       custom
@@ -480,7 +485,7 @@ export default function Checkout(props) {
           data_pengiriman: {
             kota: dataPengiriman.kota,
             alamat: dataPengiriman.alamat,
-            kurir: dataPengiriman.kurir
+            pengiriman: dataPengiriman.pengiriman
           },
           status: 2,
           jenis: 0,
@@ -594,6 +599,10 @@ export default function Checkout(props) {
   }
 
   function FinishedPage(props) {
+    const chgTrxNbr = (transactionNumber) => {
+      return `TRX${transactionNumber.toString().padStart(4, '0')}`;
+    }
+
     const { currentStep, nomorTransaksi } = props;
 
     if (currentStep !== 4) return null;
@@ -608,7 +617,7 @@ export default function Checkout(props) {
           <h2 className="mt-3">Checkout Berhasil</h2>
           <p className="body-text">
             Terimakasih sudah melakukan pemesanan obat di Apotek Sugosha.
-            Pesanan anda <br /> dengan  <b>Nomor transaksi : {nomorTransaksi}</b>  akan segera kami proses
+            Pesanan anda <br /> dengan  <b>Nomor transaksi : {chgTrxNbr(nomorTransaksi)}</b>  akan segera kami proses
           </p>
           <LinkContainer to='/status'>
             <Button

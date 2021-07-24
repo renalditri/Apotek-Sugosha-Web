@@ -80,7 +80,10 @@ export default function Products(props) {
             color:
               "#FE9A22"
           }}>
-          <b>{statusData.data_pengiriman.Kurir ?? statusData.data_pengiriman.Pengiriman}</b>
+          <b>
+            {(statusData.data_pengiriman.nomor_telepon) ? statusData.data_pengiriman.pengiriman.split('-')[0] : statusData.data_pengiriman.pengiriman}
+            {(statusData.data_pengiriman.nomor_telepon) ? ' - Nomor Kurir: ' + statusData.data_pengiriman.nomor_telepon : ''}
+          </b>
         </Col>
       </Row>
       :

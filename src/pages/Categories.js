@@ -6,7 +6,8 @@ import categories from '../assets/data/Categories.Data';
 
 export default function Categories() {
   const { url } = useRouteMatch();
-  const [categoryList, setCategoryList] = useState(categories);
+  const [categoryFull, setCategoryFull] = useState(categories);
+  const [categoryList, setCategoryList] = useState(categoryFull);
   const path = [{ name: 'Home', to: '/' }]
   const current = 'Kategori'
 
@@ -24,7 +25,8 @@ export default function Categories() {
           })
         }
       })
-      setCategoryList(arr)
+      setCategoryFull(arr);
+      setCategoryList(arr);
     })
     .catch(err => {
       console.error('Error: ', err)
@@ -38,7 +40,7 @@ export default function Categories() {
 
   function search(e, categories) {
     console.log(e.target.value);
-    setCategoryList(categories.filter(category => {
+    setCategoryList(categoryFull.filter(category => {
       if (category.nama.toLowerCase().trim().includes(e.target.value.toLowerCase().trim())) return true;
       return false;
     }))
@@ -57,7 +59,7 @@ export default function Categories() {
         <Col xs={8}>
           <Row>
             <Col xs={6}>
-              <Form.Control className="body-text" onChange={(e) => search(e, categories)} type="text" placeholder="Cari Kategori" />
+              <Form.Control className="body-text" onChange={(e) => search(e, categoryList)} type="text" placeholder="Cari Kategori" />
             </Col>
           </Row>
         </Col>

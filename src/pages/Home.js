@@ -29,7 +29,7 @@ function Home(props) {
             })
           }
         })
-        dataFetch.category = arr;
+        dataFetch.category = arr.slice(0, 6);
       })
       .then(res => {
         return fetch('http://localhost:4000/top');
@@ -43,6 +43,7 @@ function Home(props) {
         dataFetch.product = res;
       })
       .then(res => {
+        console.log('tes', dataFetch)
         setCategoryList(dataFetch.category);
         setProductList(dataFetch.product);
         if (props.history.location.state) {

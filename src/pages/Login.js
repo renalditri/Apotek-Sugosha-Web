@@ -47,7 +47,7 @@ function Login(props) {
         Swal.fire({
           icon: "error",
           title: "Gagal",
-          text: (wrongData) ? "Nomor Hp/Password yang dimasukkan salah" : "Terdapat masalah dalam proses login",
+          text: (wrongData) ? "Terdapat masalah dalam proses login" : "Nomor Hp/Password yang dimasukkan salah",
           showConfirmButton: false,
           timer: 1800,
         });

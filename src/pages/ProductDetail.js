@@ -112,11 +112,11 @@ export default function ProductDetail(props) {
           <DeskripsiObat {...product} />
         </Col>
       </Row>
-      <Row className="my-3 mt-5">
+      {/* <Row className="my-3 mt-5">
         <Col>
           <h3>Produk kategori terkait</h3>
         </Col>
-      </Row>
+      </Row> */}
     </Container>
   )
 }

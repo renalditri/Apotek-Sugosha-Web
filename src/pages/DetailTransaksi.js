@@ -45,9 +45,9 @@ export default function DetailTransaksi(props) {
           title: "Berhasil",
           text: "Transaksi Dibatalkan",
           showConfirmButton: false,
-          timer: 800,
+          timer: 1800,
         });
-        setTimeout(function() {
+        setTimeout(function () {
           window.location.reload();
         }, 800)
       })
@@ -55,6 +55,35 @@ export default function DetailTransaksi(props) {
 
   const checkoutTransaksi = () => {
     props.history.push("/checkout/" + statusData.nomor_transaksi);
+  }
+
+  const delivered = () => {
+    let myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+    let urlencoded = new URLSearchParams();
+    urlencoded.append("status", "4");
+
+    const requestOptions = {
+      method: 'PUT',
+      headers: myHeaders,
+      body: urlencoded,
+    };
+    fetch(`http://localhost:4000/status/${statusData.nomor_transaksi}`, requestOptions)
+      .then(res => res.json())
+      .then(res => {
+        console.log(res);
+        Swal.fire({
+          icon: "success",
+          title: "Obat Diterima",
+          text: "Transaksi telah selesai",
+          showConfirmButton: false,
+          timer: 1800,
+        });
+        setTimeout(function () {
+          window.location.reload();
+        }, 1800)
+      })
   }
 
   if (statusData.message) {
@@ -100,7 +129,7 @@ export default function DetailTransaksi(props) {
           <Row>
             <Col>
               <Card className="pt-4 px-3">
-                <Header data={statusData} checkout={checkoutTransaksi} cancel={cancelTransaksi} />
+                <Header data={statusData} checkout={checkoutTransaksi} cancel={cancelTransaksi} delivered={delivered} />
               </Card>
             </Col>
           </Row>

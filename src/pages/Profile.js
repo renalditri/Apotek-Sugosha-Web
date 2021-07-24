@@ -156,7 +156,6 @@ export default function Profile() {
         <Row className="mt-3">
           <Col>
             <h1>Profil Saya</h1>
-            <p>{nama + ' ' + nomor_telepon + ' ' + kota + ' ' + alamat + ' ' + TglLahir}</p>
           </Col>
         </Row>
         <Row className="mt-4">

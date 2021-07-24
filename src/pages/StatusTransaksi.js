@@ -26,6 +26,7 @@ export default function StatusTransaksi() {
   const [filterStatus, setFilterStatus] = useState(statusCode.SEMUA);
   const [filterJenis, setFilterJenis] = useState(jenisCode.SEMUA);
   const [statusTransaksi, setStatusTransaksi] = useState(plStatusTransaksi);
+  const Swal = require("sweetalert2");
 
    /* fungsi date and time */
    function convertdate(date_str) {
@@ -52,7 +53,7 @@ export default function StatusTransaksi() {
       mnt = "0" + mnt;
     }
 
-    return `${yr}-${mn}-${dt} ${hr}:${mnt} WITA`;
+    return `${dt}/${mn}/${yr} ${hr}:${mnt} WITA`;
   }
 
   useEffect(() => {
@@ -81,6 +82,35 @@ export default function StatusTransaksi() {
     console.log('tes')
   }, [])
 
+  const onClickDiterima = (nomor_transaksi) => {
+    let myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+    let urlencoded = new URLSearchParams();
+    urlencoded.append("status", "4");
+
+    const requestOptions = {
+      method: 'PUT',
+      headers: myHeaders,
+      body: urlencoded,
+    };
+    fetch(`http://localhost:4000/status/${nomor_transaksi}`, requestOptions)
+      .then(res => res.json())
+      .then(res => {
+        console.log('yang ini kan?');
+        Swal.fire({
+          icon: "success",
+          title: "Obat Diterima",
+          text: "Transaksi telah selesai",
+          showConfirmButton: false,
+          timer: 1800,
+        });
+        setTimeout(function () {
+          window.location.reload();
+        }, 1800)
+      })
+  }
+
   return (
     <Container>
       <Row className="mt-3">
@@ -107,7 +137,7 @@ export default function StatusTransaksi() {
       </Row>
       <Row className="my-3">
         <Col>
-          <StatusCardDeck datas={statusTransaksi} status={filterStatus} jenis={filterJenis} />
+          <StatusCardDeck datas={statusTransaksi} status={filterStatus} jenis={filterJenis} onclick={onClickDiterima} />
         </Col>
       </Row>
     </Container>

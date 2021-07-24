@@ -57,6 +57,8 @@ function Daftar(props) {
           icon: "success",
           title: "Berhasil",
           text: "Login berhasil",
+          showConfirmButton: false,
+          timer: 1800,
         });
       })
       .then(res => {
@@ -67,7 +69,9 @@ function Daftar(props) {
         Swal.fire({
           icon: "error",
           title: "Gagal",
-          text: "Terdapat masalah saat membuat pengguna"
+          text: err,
+          showConfirmButton: false,
+          timer: 1800,
         });
       })
     } else {

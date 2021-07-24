@@ -5,7 +5,7 @@ import Currency from '../../../Currency';
 import { LinkContainer } from 'react-router-bootstrap';
 
 export default function StatusCard(props) {
-  const { data, thisKey } = props;
+  const { data, thisKey, onclick } = props;
   const key = thisKey;
   if(data.produk.length < 1 && data.jenis == 0) {
     console.log('BATAL', data);
@@ -27,10 +27,39 @@ export default function StatusCard(props) {
     return status[key];
   }
 
+  const chgTrxNbr = (transactionNumber) => {
+    return `TRX${transactionNumber.toString().padStart(4, '0')}`;
+  }
+
   const usedData = {
     "img_path": ((isResep) ? data.foto_resep : produkUtama.img_path),
     "produk_text": ((isResep) ? `Tebus Resep (${data.id_resep})` : `${produkUtama.nama_produk} (${produkUtama.jumlah} ${produkUtama.satuan})`),
     "total_harga": ((isResep && data.status === 0) ? "Menunggu Verifikasi" : Currency.format(data.total))
+  }
+
+  const confirmOnclick = () => {
+    console.log('testeasfad')
+    const Swal = require("sweetalert2");
+    const swalWithBootstrapButtons = Swal.mixin({
+      customClass: {
+        confirmButton: 'btn btn-success mr-2',
+        denyButton: 'btn btn-outline-dark ml-2'
+      },
+      buttonsStyling: false
+    })
+    swalWithBootstrapButtons.fire({
+      title: 'Anda Yakin?',
+      icon: 'warning',
+      text: 'Pastikan obat sudah diterima dengan lengkap',
+      showDenyButton: true,
+      confirmButtonText: 'Obat Diterima',
+      denyButtonText: `Kembali`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        onclick(data.nomor_transaksi)
+      }
+    })
   }
 
   const CardHeader = () => (
@@ -38,7 +67,7 @@ export default function StatusCard(props) {
       <Col key={'col-1-' + key} className="d-flex" style={{ minHeight: '5.5rem' }}>
         <div key={'div-1-' + key}>
           <Text key={'text-1-' + key} type="large-label">Nomor Transaksi : </Text>
-          <Text key={'text-2-' + key} type="body">{data.nomor_transaksi}</Text>
+          <Text key={'text-2-' + key} type="body">{chgTrxNbr(data.nomor_transaksi)}</Text>
         </div>
         <div key={'div-2-' + key} className="pl-5" style={{ flexGrow: 3 }}>
           <Text key={'text-3-' + key} type="large-label">Tanggal Transaksi : </Text>
@@ -69,10 +98,20 @@ export default function StatusCard(props) {
             <Text key={'text-10-' + key} type="large-label" green>{usedData.total_harga}</Text>
           </div>
           <div key={'div-7-' + key} className="d-flex flex-column align-items-start justify-content-start px-3 py-1" style={{ flexGrow: 2 }}>
-            <LinkContainer to={"/status/" + data.nomor_transaksi} style={{ minWidth: '10rem' }}>
-              <Button key={'button-1-' + key} className="my-auto">Detail Pesanan</Button>
+            <LinkContainer to={"/status/" + data.nomor_transaksi} style={{ minWidth: '10rem', borderRadius: '8px' }}>
+              <Button key={'button-1-' + key} className={(data.status !== 3) ? 'my-auto' : 'mt-3'}>Detail Pesanan</Button>
             </LinkContainer>
-            {(data.status === 3) ? <Button key={'button-2-' + key} className="mt-2" style={{ minWidth: '10rem' }}>Obat Diterima</Button> : ''}
+            {(data.status === 3) ? 
+            <Button
+             key={'button-2-' + key} 
+             className="mt-2" 
+             style={{ minWidth: '10rem', borderRadius: '8px' }}
+             onClick={() => {confirmOnclick()}}
+             >
+              Obat Diterima
+              </Button> 
+              : 
+            ''}
           </div>
         </Col>
       </Row>

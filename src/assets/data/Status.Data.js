@@ -7,9 +7,9 @@ const statusTransaksi =
       "tanggal": "13/03/2021 16:00 WITA",
       "jenis": 0,
       "data_pengiriman": {
-        "Kota": 'Denpasar',
-        "Alamat": 'Jalan Dingin nomor 1',
-        "Kurir" : "Gojek"
+        "kota": 'Denpasar',
+        "alamat": 'Jalan Dingin nomor 1',
+        "pengiriman" : "Gojek"
       },
       "produk": [
         {
