@@ -3,34 +3,40 @@ import { _CardDeck, Text, Breadcrumb } from '../components/parts';
 import { Row, Col, Container, Form } from 'react-bootstrap';
 import { BrowserRouter as Router, useRouteMatch } from "react-router-dom";
 import categories from '../assets/data/Categories.Data';
+import config from '../config.json';
 
 export default function Categories() {
   const { url } = useRouteMatch();
   const [categoryFull, setCategoryFull] = useState(categories);
   const [categoryList, setCategoryList] = useState(categoryFull);
+  const [loading, setLoading] = useState(true);
   const path = [{ name: 'Home', to: '/' }]
   const current = 'Kategori'
 
   useEffect(() => {
-    fetch('http://localhost:4000/kategori')
-    .then(res => res.json())
-    .then(res => {
-      let arr = []
-      res.map(r => {
-        if(r.tampil) {
-          arr.push({
-            id: r.id_kategori,
-            nama: r.nama,
-            img_path: 'http://localhost:4000/' + r.img_path
-          })
-        }
+    fetch(`${config.base_url}/kategori`)
+      .then(res => res.json())
+      .then(res => {
+        let arr = []
+        res.map(r => {
+          if (r.tampil) {
+            arr.push({
+              id: r.id_kategori,
+              nama: r.nama,
+              img_path: config.base_url + '/' + r.img_path
+            })
+          }
+        })
+        setCategoryFull(arr);
+        setCategoryList(arr);
       })
-      setCategoryFull(arr);
-      setCategoryList(arr);
-    })
-    .catch(err => {
-      console.error('Error: ', err)
-    })
+      .then(res => {
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error: ', err);
+        setLoading(false);
+      })
   }, []);
 
   const isReverse = (e) => {
@@ -48,6 +54,11 @@ export default function Categories() {
 
   return (
     <Container>
+      <div className={(loading) ? "loading d-flex justify-content-center align-items-center" : "done-loading"}>
+        <div className="spinner-border text-primary" style={{ width: '5rem', height: '5rem' }} role="status">
+          <span className="sr-only">Loading...</span>
+        </div>
+      </div>
       <Breadcrumb className="mt-3" url={path} current={current} />
       <Row>
         <Col>
@@ -67,11 +78,11 @@ export default function Categories() {
           <Text style={{ fontWeight: 'bold' }} type="body">Urutkan</Text>
         </Col>
         <Col xs={3}>
-          <Form.Control 
-          className="body-text" 
-          as="select" 
-          custom
-          onChange={(e) => { isReverse(e) }}
+          <Form.Control
+            className="body-text"
+            as="select"
+            custom
+            onChange={(e) => { isReverse(e) }}
           >
             <option>Urutkan nama A-Z</option>
             <option>Urutkan nama Z-A</option>

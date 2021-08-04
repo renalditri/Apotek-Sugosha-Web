@@ -10,6 +10,7 @@ export default function Profile() {
   const [kota, setKota] = useState('');
   const [alamat, setAlamat] = useState('');
   const [TglLahir, setTglLahir] = useState('');
+  const [loading, setLoading] = useState(true);
   const { token, ...user_data } = JSON.parse(authenticationService.currentUser);
   const [style, setStyle] = useState(Array(5).fill({}))
   const isSavedData = (user_data.saved_data) ? true : false;
@@ -23,6 +24,7 @@ export default function Profile() {
       setKota(user_data.saved_data.kota);
       setAlamat(user_data.saved_data.alamat)
     }
+    setLoading(false);
   }, [])
 
   const handleChange = (i, e) => {
@@ -152,6 +154,11 @@ export default function Profile() {
 
   return (
     <Container className="body-text">
+      <div className={(loading) ? "loading d-flex justify-content-center align-items-center" : "done-loading"}>
+        <div className="spinner-border text-primary" style={{ width: '5rem', height: '5rem' }} role="status">
+          <span className="sr-only">Loading...</span>
+        </div>
+      </div>
       <Form>
         <Row className="mt-3">
           <Col>

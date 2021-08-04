@@ -4,6 +4,7 @@ import { Text } from '../components/parts';
 import { Header, Img, Products } from '../components/parts/DetailCard';
 import { useParams, useRouteMatch, Router, Link } from "react-router-dom";
 import statusTransaksi from '../assets/data/Status.Data';
+import config from '../config.json';
 
 let update = false;
 
@@ -12,31 +13,37 @@ export default function DetailTransaksi(props) {
   const { url } = useRouteMatch();
   const [statusData, setStatusData] = useState(statusTransaksi[0]);
   const [not_found, setNotFound] = useState(false);
+  const [loading, setLoading] = useState(true);
   const Swal = require("sweetalert2");
 
   useEffect(() => {
-    fetch('http://localhost:4000/transaksi/' + statusID)
+    setLoading(true);
+    fetch(`${config.base_url}/transaksi/` + statusID)
       .then(res => res.json())
       .then(res => {
         if (res.foto_resep) {
-          res.foto_resep = 'http://localhost:4000/' + res.foto_resep;
+          res.foto_resep = config.base_url + '/' + res.foto_resep;
         }
         if (res.produk) {
           res.produk.map(r => {
-            r.img_path = 'http://localhost:4000/' + r.img_path;
+            r.img_path = config.base_url + '/' + r.img_path;
           })
         }
         setStatusData(res);
         return;
       })
+      .then(res => {
+        setLoading(false);
+      })
       .catch(err => {
         console.log('Err : ', err);
         setNotFound(true);
+        setLoading(false);
       })
   }, [update])
 
   const cancelTransaksi = () => {
-    fetch(`http://localhost:4000/transaksi/${statusData.nomor_transaksi}/cancel`, { method: 'PUT' })
+    fetch(`${config.base_url}/transaksi/${statusData.nomor_transaksi}/cancel`, { method: 'PUT' })
       .then(res => res.json())
       .then(res => {
         console.log(res);
@@ -69,7 +76,7 @@ export default function DetailTransaksi(props) {
       headers: myHeaders,
       body: urlencoded,
     };
-    fetch(`http://localhost:4000/status/${statusData.nomor_transaksi}`, requestOptions)
+    fetch(`${config.base_url}/status/${statusData.nomor_transaksi}`, requestOptions)
       .then(res => res.json())
       .then(res => {
         console.log(res);
@@ -117,6 +124,11 @@ export default function DetailTransaksi(props) {
 
   return (
     <Container>
+      <div className={(loading) ? "loading d-flex justify-content-center align-items-center" : "done-loading"}>
+        <div className="spinner-border text-primary" style={{ width: '5rem', height: '5rem' }} role="status">
+          <span className="sr-only">Loading...</span>
+        </div>
+      </div>
       <Row>
         <Col>
           <BackButton />

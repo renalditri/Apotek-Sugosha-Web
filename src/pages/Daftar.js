@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Container, Button, Form } from "react-bootstrap";
-import { authenticationService } from "../services/authentication"
+import { authenticationService } from "../services/authentication";
+import config from '../config.json';
 
 function Daftar(props) {
   const [Nama, setNama] = useState("");
@@ -45,7 +46,7 @@ function Daftar(props) {
     }
 
     if (isValid()) {
-      fetch('http://localhost:4000/pembeli', requestOptions)
+      fetch(`${config.base_url}/pembeli`, requestOptions)
       .then(res => res.json())
       .then(res => {
         return authenticationService.login(res.nomor_telepon, password);

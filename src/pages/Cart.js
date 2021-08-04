@@ -5,13 +5,14 @@ import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import Currency from '../Currency';
 import { LinkContainer } from 'react-router-bootstrap';
 import { authenticationService } from '../services/authentication';
-import config from '../config.json'
+import config from '../config.json';
 
 const user_id = authenticationService.user_id;
 
 export default function Cart(props) {
   const [carts, setCarts] = useState(plCarts);
   const [valid, setValid] = useState(true);
+  const [loading, setLoading] = useState(true);
   const Swal = require("sweetalert2");
   useEffect(() => {
     fetch(config.base_url + `/keranjang/${user_id}`)
@@ -25,6 +26,9 @@ export default function Cart(props) {
           return;
         }
         setCarts({ produk: [] })
+      })
+      .then(res => {
+        setLoading(false);
       })
   }, [])
 
@@ -85,6 +89,11 @@ export default function Cart(props) {
 
   return (
     <Container>
+      <div className={(loading) ? "loading d-flex justify-content-center align-items-center" : "done-loading"}>
+        <div className="spinner-border text-primary" style={{ width: '5rem', height: '5rem' }} role="status">
+          <span className="sr-only">Loading...</span>
+        </div>
+      </div>
       <Row className="mt-3">
         <Col>
           <h1>Keranjang</h1>

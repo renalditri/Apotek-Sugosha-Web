@@ -5,6 +5,7 @@ import plStatusTransaksi from '../assets/data/Status.Data';
 import Currency from '../Currency';
 import StatusCardDeck from '../components/parts/Status/StatusCardDeck';
 import { authenticationService } from '../services/authentication';
+import config from '../config.json';
 
 const user_id = authenticationService.user_id;
 
@@ -26,10 +27,11 @@ export default function StatusTransaksi() {
   const [filterStatus, setFilterStatus] = useState(statusCode.SEMUA);
   const [filterJenis, setFilterJenis] = useState(jenisCode.SEMUA);
   const [statusTransaksi, setStatusTransaksi] = useState(plStatusTransaksi);
+  const [loading, setLoading] = useState(true);
   const Swal = require("sweetalert2");
 
-   /* fungsi date and time */
-   function convertdate(date_str) {
+  /* fungsi date and time */
+  function convertdate(date_str) {
     let tanggal = new Date(date_str);
     let yr, mn, dt, hr, mnt, sec;
     tanggal.setHours(tanggal.getHours() + 0);
@@ -57,16 +59,17 @@ export default function StatusTransaksi() {
   }
 
   useEffect(() => {
-    fetch(`http://localhost:4000/transaksi/pembeli/${user_id}`)
+    setLoading(true);
+    fetch(`${config.base_url}/transaksi/pembeli/${user_id}`)
       .then(res => res.json())
       .then(resolve => {
         console.log('tes', resolve)
         resolve.map(res => {
-          if (res.foto_resep) { res.foto_resep = 'http://localhost:4000/' + res.foto_resep }
-          if (res.bukti_pembayaran) { res.bukti_pembayaran = 'http://localhost:4000/' + res.bukti_pembayaran }
+          if (res.foto_resep) { res.foto_resep = config.base_url + '/' + res.foto_resep }
+          if (res.bukti_pembayaran) { res.bukti_pembayaran = config.base_url + res.bukti_pembayaran }
           if (res.produk) {
             res.produk.map(r => {
-              if (r.img_path) { r.img_path = 'http://localhost:4000/' + r.img_path }
+              if (r.img_path) { r.img_path = config.base_url + '/' + r.img_path }
             })
           }
           res.tanggal = convertdate(res.tanggal);
@@ -74,9 +77,13 @@ export default function StatusTransaksi() {
         console.log(resolve)
         setStatusTransaksi(resolve);
       })
+      .then(res => {
+        setLoading(false);
+      })
       .catch(err => {
         setStatusTransaksi([]);
-        console.log(err)
+        console.log(err);
+        setLoading(false);
       })
 
     console.log('tes')
@@ -94,7 +101,7 @@ export default function StatusTransaksi() {
       headers: myHeaders,
       body: urlencoded,
     };
-    fetch(`http://localhost:4000/status/${nomor_transaksi}`, requestOptions)
+    fetch(`${config.base_url}/status/${nomor_transaksi}`, requestOptions)
       .then(res => res.json())
       .then(res => {
         console.log('yang ini kan?');
@@ -113,6 +120,11 @@ export default function StatusTransaksi() {
 
   return (
     <Container>
+      <div className={(loading) ? "loading d-flex justify-content-center align-items-center" : "done-loading"}>
+        <div className="spinner-border text-primary" style={{ width: '5rem', height: '5rem' }} role="status">
+          <span className="sr-only">Loading...</span>
+        </div>
+      </div>
       <Row className="mt-3">
         <Col>
           <h1>Status Transaksi</h1>

@@ -3,7 +3,8 @@ import { Container, Row, Col, Form, Card } from 'react-bootstrap';
 import { useLocation, useRouteMatch, Router, Link } from "react-router-dom";
 import plCategories from '../assets/data/Categories.Data';
 import plProducts from '../assets/data/Products.Data';
-import { _CardDeck, Text, Breadcrumb } from '../components/parts'
+import { _CardDeck, Text, Breadcrumb } from '../components/parts';
+import config from '../config.json';
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -15,10 +16,12 @@ export default function Product() {
   const current = 'Katalog Produk';
   const [categoryList, setCategoryList] = useState(plCategories);
   const [products, setProducts] = useState(plProducts);
+  const [loading, setLoading] = useState(true);
   const query = useQuery();
 
   useEffect(() => {
-    fetch(`http://localhost:4000/kategori`)
+    setLoading(true);
+    fetch(`${config.base_url}/kategori`)
       .then(res => res.json())
       .then(res => {
         res.map(r => {
@@ -26,20 +29,24 @@ export default function Product() {
           delete r.id_kategori;
         })
         setCategoryList(res);
-        return fetch('http://localhost:4000/produk')
+        return fetch(`${config.base_url}/produk`)
       })
       .then(res => res.json())
       .then(res => {
         res.map(r => {
           r.id = r.id_produk;
           delete r.id_produk;
-          r.img_path = 'http://localhost:4000/' + r.img_path;
+          r.img_path = config.base_url + '/' + r.img_path;
         })
         setProducts(search(query.get('search'), res));
         console.log("resting")
       })
+      .then(res => {
+        setLoading(false);
+      })
       .catch(err => {
-        console.log("Error", err)
+        console.log("Error", err);
+        setLoading(false);
       })
   }, [query.get('search')])
 
@@ -51,6 +58,11 @@ export default function Product() {
 
   return (
     <Container>
+      <div className={(loading) ? "loading d-flex justify-content-center align-items-center" : "done-loading"}>
+        <div className="spinner-border text-primary" style={{ width: '5rem', height: '5rem' }} role="status">
+          <span className="sr-only">Loading...</span>
+        </div>
+      </div>
       <Breadcrumb className="mt-5" url={path} current={current} />
       <Row className="mt-3">
         <Col md={3}>

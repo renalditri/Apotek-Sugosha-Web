@@ -8,9 +8,10 @@ import plUserData from '../assets/data/User.Data';
 import Currency from '../Currency';
 import { authenticationService } from '../services/authentication';
 import { LinkContainer } from 'react-router-bootstrap';
+import config from '../config.json';
 
 const user_id = authenticationService.user_id;
-const base_url = 'http://localhost:4000'
+const base_url = config.base_url;
 
 export default function Checkout(props) {
   const [stepCounter, setStep] = useState(1);
@@ -61,7 +62,7 @@ export default function Checkout(props) {
       })
   }, [])
 
-  
+
   const chgTrxNbr = (transactionNumber) => {
     return `TRX${transactionNumber.toString().padStart(4, '0')}`;
   }
@@ -239,7 +240,7 @@ export default function Checkout(props) {
           kota: kota,
           alamat: alamat
         }
-        fetch(`http://localhost:4000/pembeli/${user_id}`, {
+        fetch(`${base_url}/pembeli/${user_id}`, {
           method: 'PUT',
           headers: {
             'content-type': 'application/json'
@@ -478,6 +479,7 @@ export default function Checkout(props) {
         })
           .then(res => res.json())
           .then(res => console.log(res))
+          .then(res => { onClick() })
           .catch(err => console.log(err))
       } else {
         const dataSend = {
@@ -491,7 +493,7 @@ export default function Checkout(props) {
           jenis: 0,
           produk: dataTransaksi.produk.map(p => { return { id_produk: p.id_produk, jumlah: p.jumlah } })
         }
-        console.log(JSON.stringify(dataSend));
+        console.log('DATA KIRIM', JSON.stringify(dataSend));
         fetch(base_url + '/transaksi', {
           method: 'POST',
           headers: {

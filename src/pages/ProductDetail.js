@@ -4,6 +4,7 @@ import { BrowserRouter as Router, useParams, useRouteMatch } from "react-router-
 import { Text, Breadcrumb } from '../components/parts';
 import Currency from '../Currency';
 import { authenticationService } from '../services/authentication';
+import config from '../config.json';
 
 let pathDefault = [
   { name: 'Home', to: '/' },
@@ -28,8 +29,9 @@ export default function ProductDetail(props) {
     "img_path": "/img/flu.png"
   });
   const [path, setPath] = useState(pathDefault);
+  const [loading, setLoading] = useState(true);
   if (kategoriID) {
-    fetch('http://localhost:4000/kategori/' + kategoriID)
+    fetch(`${config.base_url}/kategori/` + kategoriID)
       .then(res => res.json())
       .then(res => {
         pathDefault = [
@@ -42,13 +44,17 @@ export default function ProductDetail(props) {
   } const current = product.nama;
 
   useEffect(() => {
-    fetch('http://localhost:4000/produk/' + productID)
+    setLoading(true);
+    fetch(`${config.base_url}/produk/` + productID)
       .then(res => res.json())
       .then(res => {
         console.log('ha', product)
-        res.img_path = 'http://localhost:4000/' + res.img_path;
+        res.img_path = config.base_url + '/' + res.img_path;
         setProduct({ id: res.id_produk, ...res })
         console.log('hi', product)
+      })
+      .then(res => {
+        setLoading(false);
       })
   }, [])
 
@@ -62,7 +68,7 @@ export default function ProductDetail(props) {
   }, [pathDefault])
 
   function addCart(total) {
-    if(!user_id) {
+    if (!user_id) {
       Swal.fire({
         icon: 'error',
         title: 'Gagal',
@@ -76,33 +82,38 @@ export default function ProductDetail(props) {
       id_produk: productID,
       jumlah: total
     }
-    fetch('http://localhost:4000/keranjang/', {
+    fetch(`${config.base_url}/keranjang/`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json'
       },
       body: JSON.stringify(cart)
     })
-    .then(res => {
-      console.log(res);
-      Swal.fire({
-        icon: 'success',
-        title: 'Berhasil',
-        text: 'Produk berhasil dimasukkan ke dalam keranjang'
+      .then(res => {
+        console.log(res);
+        Swal.fire({
+          icon: 'success',
+          title: 'Berhasil',
+          text: 'Produk berhasil dimasukkan ke dalam keranjang'
+        })
       })
-    })
-    .catch(err => {
-      console.log('Err: ', err);
-      Swal.fire({
-        icon: 'error',
-        title: 'Gagal',
-        text: 'Terjadi kesalahan saat menambahkan produk'
+      .catch(err => {
+        console.log('Err: ', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: 'Terjadi kesalahan saat menambahkan produk'
+        })
       })
-    })
   }
 
   return (
     <Container className="py-3">
+      <div className={(loading) ? "loading d-flex justify-content-center align-items-center" : "done-loading"}>
+        <div className="spinner-border text-primary" style={{ width: '5rem', height: '5rem' }} role="status">
+          <span className="sr-only">Loading...</span>
+        </div>
+      </div>
       <Breadcrumb url={path} current={current} />
       <Row className="my-3">
         <ProductHead funct={addCart} {...product} />

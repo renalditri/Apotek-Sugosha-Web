@@ -6,17 +6,18 @@ import products from '../assets/data/Products.Data';
 import { BrowserRouter as Router, Link } from "react-router-dom";
 import { _CardDeck, Text } from '../components/parts'
 import { authenticationService } from '../services/authentication';
-
+import config from '../config.json';
 
 function Home(props) {
   const [categoryList, setCategoryList] = useState(categories);
   const [productList, setProductList] = useState(products);
+  const [loading, setLoading] = useState(true);
   const currentUser = authenticationService.currentUser;
   const Swal = require("sweetalert2");
 
   useEffect(() => {
     let dataFetch = {};
-    fetch('http://localhost:4000/kategori')
+    fetch(`${config.base_url}/kategori`)
       .then(res => res.json())
       .then(res => {
         let arr = []
@@ -25,20 +26,20 @@ function Home(props) {
             arr.push({
               id: r.id_kategori,
               nama: r.nama,
-              img_path: 'http://localhost:4000/' + r.img_path
+              img_path: config.base_url + '/' + r.img_path
             })
           }
         })
         dataFetch.category = arr.slice(0, 6);
       })
       .then(res => {
-        return fetch('http://localhost:4000/top');
+        return fetch(`${config.base_url}/top`);
       })
       .then(res => res.json())
       .then(res => {
         res.map(r => {
           r.id = r.id_produk;
-          r.img_path = 'http://localhost:4000/' + r.img_path
+          r.img_path = config.base_url + '/' + r.img_path
         })
         dataFetch.product = res;
       })
@@ -57,13 +58,22 @@ function Home(props) {
           }
         }
       })
+      .then(res => {
+        setLoading(false);
+      })
       .catch(err => {
-        console.error('Error: ', err)
+        console.error('Error: ', err);
+        setLoading(false);
       })
   }, []);
 
   return (
     <Container fluid>
+      <div className={(loading) ? "loading d-flex justify-content-center align-items-center" : "done-loading"}>
+        <div className="spinner-border text-primary" style={{ width: '5rem', height: '5rem' }} role="status">
+          <span className="sr-only">Loading...</span>
+        </div>
+      </div>
       <Row className="home pt-5" style={{ backgroundImage: "url('/img/Circle.png')" }}>
         <Container>
           <Row>

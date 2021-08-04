@@ -4,7 +4,8 @@ import { useParams, useRouteMatch, Router, Link } from "react-router-dom";
 import plCategories from '../assets/data/Categories.Data';
 import categoryProduct from '../assets/data/CategoryProduct.Data';
 import products from '../assets/data/Products.Data';
-import { _CardDeck, Text, Breadcrumb } from '../components/parts'
+import { _CardDeck, Text, Breadcrumb } from '../components/parts';
+import config from '../config.json';
 
 export default function Category(props) {
   const { kategoriID } = useParams();
@@ -14,46 +15,52 @@ export default function Category(props) {
   const [category, setCategory] = useState(plCategory);
   const [product, setProductList] = useState(plProduct);
   const [allCategory, setCategoryList] = useState(plCategories);
+  const [loading, setLoading] = useState(true);
   const path = [{ name: 'Home', to: '/' }, { name: 'Kategori', to: '/kategori' }]
   const current = category.nama;
 
   useEffect(() => {
-    fetch(`http://localhost:4000/kategori/${kategoriID}`)
-    .then(res => res.json())
-    .then(res => {
-      if(res.tampil) {
-        setCategory({
-          id: res.id_kategori,
-          nama: res.nama,
-          img_path: 'http://localhost:4000/' + res.img_path,
-          tampil: res.tampil
-        })
-        if(res.produk) {
-          res.produk.map(prod => {
-            prod.id = prod.id_produk;
-            prod.img_path = 'http://localhost:4000/' + prod.img_path;
+    setLoading(true);
+    fetch(`${config.base_url}/kategori/${kategoriID}`)
+      .then(res => res.json())
+      .then(res => {
+        if (res.tampil) {
+          setCategory({
+            id: res.id_kategori,
+            nama: res.nama,
+            img_path: config.base_url + '/' + res.img_path,
+            tampil: res.tampil
           })
-          setProductList(res.produk)
-        } else {
-          setProductList([])
-        }
-        return fetch('http://localhost:4000/kategori')
-      } else { setCategory(false) }
-    })
-    .then(res => res.json())
-    .then(res => {
-      res.map(r => {
-        r.id = r.id_kategori;
-        delete r.id_kategori;
+          if (res.produk) {
+            res.produk.map(prod => {
+              prod.id = prod.id_produk;
+              prod.img_path = config.base_url + '/' + prod.img_path;
+            })
+            setProductList(res.produk)
+          } else {
+            setProductList([])
+          }
+          return fetch(`${config.base_url}/kategori`)
+        } else { setCategory(false) }
       })
-      setCategoryList(res);
-    })
-    .catch(err => {
-      console.log("Error", err)
-    })
+      .then(res => res.json())
+      .then(res => {
+        res.map(r => {
+          r.id = r.id_kategori;
+          delete r.id_kategori;
+        })
+        setCategoryList(res);
+      })
+      .then(res => {
+        setLoading(false);
+      })
+      .catch(err => {
+        console.log("Error", err);
+        setLoading(false);
+      })
   }, [kategoriID])
 
-  
+
   const isReverse = (e) => {
     console.log(e.target.value);
     setProductList([...product.reverse()])
@@ -62,6 +69,11 @@ export default function Category(props) {
   if (category) {
     return (
       <Container>
+        <div className={(loading) ? "loading d-flex justify-content-center align-items-center" : "done-loading"}>
+          <div className="spinner-border text-primary" style={{ width: '5rem', height: '5rem' }} role="status">
+            <span className="sr-only">Loading...</span>
+          </div>
+        </div>
         <Breadcrumb className="mt-5" url={path} current={current} />
         <Row className="mt-3">
           <Col md={3}>
@@ -80,7 +92,7 @@ export default function Category(props) {
                 <Text style={{ fontWeight: 'bold' }} type="body">Urutkan</Text>
               </Col>
               <Col md={4}>
-                <Form.Control className="body-text" as="select" onChange={(e) => {isReverse(e)}} custom>
+                <Form.Control className="body-text" as="select" onChange={(e) => { isReverse(e) }} custom>
                   <option>Urutkan nama A-Z</option>
                   <option>Urutkan nama Z-A</option>
                 </Form.Control>
@@ -96,6 +108,11 @@ export default function Category(props) {
   } else {
     return (
       <Container>
+        <div className={(loading) ? "loading d-flex justify-content-center align-items-center" : "done-loading"}>
+          <div className="spinner-border text-primary" style={{ width: '5rem', height: '5rem' }} role="status">
+            <span className="sr-only">Loading...</span>
+          </div>
+        </div>
         <h1>404 Not Found</h1>
       </Container>
     )
@@ -127,11 +144,11 @@ function Sidebar(props) {
       </Row>
       <Row className="mt-1">
         <Col>
-          <Form.Control 
-          className="body-text" 
-          onChange={(e) => { search(e, categories) }} 
-          type="text" 
-          placeholder="Cari Kategori" 
+          <Form.Control
+            className="body-text"
+            onChange={(e) => { search(e, categories) }}
+            type="text"
+            placeholder="Cari Kategori"
           />
         </Col>
       </Row>
@@ -139,7 +156,7 @@ function Sidebar(props) {
         <Col style={{ maxHeight: "380px", overflowY: "scroll" }}>
           {categoryList.map((item, i) => {
             const isActive = (kategoriID == item.id) ? "active" : "";
-            if(item.tampil) {
+            if (item.tampil) {
               return (
                 <Row className="mt-1" key={`r-${i}`}>
                   <Col key={`c-${i}`}>

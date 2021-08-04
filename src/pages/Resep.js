@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Container, Row, Col, Form, Card, Button } from 'react-bootstrap';
 import { Text } from '../components/parts'
 import { authenticationService } from '../services/authentication';
+import config from '../config.json';
 const Swal = require("sweetalert2");
 
 const user_id = authenticationService.user_id;
@@ -26,7 +27,7 @@ function Resep(props) {
       formData.append("status", 0);
       formData.append("jenis", 1);
       formData.append("resep", img);
-      fetch('http://localhost:4000/transaksi/resep', {
+      fetch(`${config.base_url}/transaksi/resep`, {
         method: 'POST',
         body: formData
       })
