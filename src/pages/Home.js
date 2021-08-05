@@ -86,7 +86,7 @@ function Home(props) {
           <Col className="mt-5">
             <Row>
               <Col>
-                <h2>Kategori Populer</h2>
+                <h2>Kategori Obat</h2>
               </Col>
             </Row>
             <Row>
@@ -110,6 +110,13 @@ function Home(props) {
               </Col>
               <_CardDeck type="product" array={productList} url={'/produk'} md={3} />
             </Row>
+          </Col>
+        </Row>
+        <Row>
+          <Col className="mt-5">
+            <a href="https://api.whatsapp.com/send?phone=62811397719" target="_blank" >
+              <img className="img-fluid" src="/img/whatsapp.png" />
+            </a>
           </Col>
         </Row>
       </Container>

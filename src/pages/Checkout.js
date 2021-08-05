@@ -18,17 +18,20 @@ export default function Checkout(props) {
   const [userData, setUserData] = useState(plUserData);
   const { nomorTR } = useParams();
   const [dataTransaksi, setData] = useState(plCarts);
+  const [loading, setLoading] = useState(false);
   const [nomorTransaksi, setNomorTR] = useState(nomorTR ?? '');
   const [dataPengiriman, setDataPengiriman] = useState();
   const Swal = require("sweetalert2");
 
   useEffect(() => {
+    setLoading(true);
     const { token, ...user } = JSON.parse(authenticationService.currentUser);
     setUserData(user);
     const url = (nomorTR) ? `${base_url}/transaksi/${nomorTR}` : `${base_url}/keranjang/${user_id}`;
     fetch(url)
       .then(res => res.json())
       .then(res => {
+        setLoading(false);
         if (res.status) {
           if (res.status !== 1 || res.jenis !== 1) {
             Swal.fire({
@@ -71,6 +74,11 @@ export default function Checkout(props) {
     <>
       {(stepCounter == 4) ? <Header /> : ''}
       <Container className={(stepCounter == 4) ? 'mb-0 pb-0' : ''}>
+        <div className={(loading) ? "loading d-flex justify-content-center align-items-center" : "done-loading"}>
+          <div className="spinner-border text-primary" style={{ width: '5rem', height: '5rem' }} role="status">
+            <span className="sr-only">Loading...</span>
+          </div>
+        </div>
         {(stepCounter < 4) ? (
           <>
             <Row className="mt-3">
@@ -469,6 +477,7 @@ export default function Checkout(props) {
         });
         return;
       }
+      setLoading(true);
       const formData = new FormData();
       if (nomorTR) {
         formData.append("nomor_transaksi", nomorTR);
@@ -478,7 +487,10 @@ export default function Checkout(props) {
           body: formData,
         })
           .then(res => res.json())
-          .then(res => console.log(res))
+          .then(res => {
+            console.log(res);
+            setLoading(false);
+          })
           .then(res => { onClick() })
           .catch(err => console.log(err))
       } else {
@@ -517,6 +529,7 @@ export default function Checkout(props) {
           .then(res => res.json())
           .then(res => {
             console.log(res);
+            setLoading(false);
             Swal.fire({
               icon: "success",
               title: "Berhasil",
@@ -526,7 +539,9 @@ export default function Checkout(props) {
             });
             return fetch(base_url + '/keranjang/' + user_id, { method: 'DELETE' })
           })
-          .then(res => { onClick() })
+          .then(res => { 
+            onClick();
+          })
           .catch(err => console.log(err))
       }
     }
