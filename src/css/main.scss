@@ -49,6 +49,28 @@ $colors: (
   "gray-dark": $gray-800
 ) !default;
 
+
+$primary:       $green !default;
+$secondary:     $gray-600 !default;
+$success:       $green !default;
+$info:          $cyan !default;
+$warning:       $yellow !default;
+$danger:        $red !default;
+$light:         $gray-100 !default;
+$dark:          $gray-800 !default;
+
+
+$theme-colors: (
+  "primary":    $primary,
+  "secondary":  $secondary,
+  "success":    $success,
+  "info":       $info,
+  "warning":    $warning,
+  "danger":     $danger,
+  "light":      $light,
+  "dark":       $dark
+) !default;
+
 @import "~bootstrap/scss/bootstrap";
 @import "mediumscreen.css";
 @import "smallscreen.css";
